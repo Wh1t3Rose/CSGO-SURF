@@ -1,0 +1,140 @@
+﻿//**********************************************  Valid Colors	***********************************************
+
+// {NORMAL}, {DARKRED}, {PINK}, {YELLOW}, {GREEN}, {LIGHTGREEN}, {RED}, {GRAY}, {BLUE}, {DARKBLUE}, {PURPLE}  *
+
+//*************************************************************************************************************
+
+
+
+"Phrases"
+
+{
+	"Admin joined"
+	{
+		"#format"		"{1:N}"
+		"fr"			"[{GREEN}JOIN{NORMAL}] {RED}L'Admin{NORMAL}: {BLUE}{1}{NORMAL} a rejoint le serveur."
+		"en"			"[{GREEN}JOIN{NORMAL}] {RED}Admin{NORMAL}: {BLUE}{1}{NORMAL} has joined the server."
+	}
+	
+	"Vip joined"
+	{
+		"#format"		"{1:N}"
+		"fr"			"[{GREEN}JOIN{NORMAL}] {GREEN}Le Vip{NORMAL}: {BLUE}{1}{NORMAL} a rejoint le serveur."
+		"en"			"[{GREEN}JOIN{NORMAL}] {GREEN}Vip{NORMAL}: {BLUE}{1}{NORMAL} has joined the server."
+	}
+
+	"Admin left"
+	{
+		"#format"		"{1:N}"
+		"fr"			"[{GREEN}JOIN{NORMAL}] {RED}L'Admin{NORMAL}: {BLUE}{1}{NORMAL} a quitté le serveur."
+		"en"			"[{GREEN}JOIN{NORMAL}] {RED}Admin{NORMAL}: {BLUE}{1}{NORMAL} left the server."
+	}
+	
+	"Vip left"
+	{
+		"#format"		"{1:N}"
+		"fr"			"[{GREEN}JOIN{NORMAL}] {GREEN}Le Vip{NORMAL}: {BLUE}{1}{NORMAL} a quitté le serveur."
+		"en"			"[{GREEN}JOIN{NORMAL}] {GREEN}Vip{NORMAL}: {BLUE}{1}{NORMAL} left the server."
+	}
+
+	"Enabled"
+	{
+		"fr"			"Activé"
+		"en"			"Enabled"
+	}
+
+	"Disabled"
+	{
+		"fr"			"Désactivé"
+		"en"			"Disabled"
+	}
+
+	"MenuJoinSounds_TITLE"
+	{
+		"fr"			"Menu: Notifications de connexion"
+		"en"			"Menu: Notifications connection"
+	}
+
+	"MenuJoinSounds_TCHAT_MENU_TITLE"
+	{
+		"fr"			"Messages"
+		"en"			"Messages"
+	}
+
+	"MenuJoinSounds_SOUNDS_MENU_TITLE"
+	{
+		"fr"			"Sounds"
+		"en"			"Sons"
+	}
+
+	"MenuJoinSoundsTchat_TITLE"
+	{
+		"fr"			"Menu: Message de connexion"
+		"en"			"Menu: Connection message"
+	}
+
+	"MenuJoinSoundsTchat_ADMIN_JOIN_MENU_TITLE"
+	{
+		"#format"		"{1:s}"
+		"fr"			"Quand un admin rejoint: {1}"
+		"en"			"When an admin joins: {1}"
+	}
+
+	"MenuJoinSoundsTchat_VIP_JOIN_MENU_TITLE"
+	{
+		"#format"		"{1:s}"
+		"fr"			"Quand un vip rejoint: {1}"
+		"en"			"When a vip joins: {1}"
+	}
+
+	"MenuJoinSoundsTchat_ADMIN_LEAVE_MENU_TITLE"
+	{
+		"#format"		"{1:s}"
+		"fr"			"Quand un admin part: {1}"
+		"en"			"When an admin leaves: {1}"
+	}
+
+	"MenuJoinSoundsTchat_VIP_LEAVE_MENU_TITLE"
+	{
+		"#format"		"{1:s}"
+		"fr"			"Quand un vip part: {1}"
+		"en"			"When a vip leaves: {1}"
+	}
+
+	"MenuJoinSoundsSound_TITLE"
+	{
+		"fr"			"Menu: Son de connexion"
+		"en"			"Menu: Connection sound"
+	}
+
+	"MenuJoinSoundsSound_ADMIN_JOIN_MENU_TITLE"
+	{
+		"#format"		"{1:s}"
+		"fr"			"Quand un admin rejoint: {1}"
+		"en"			"When an admin joins: {1}"
+	}
+
+	"MenuJoinSoundsSound_VIP_JOIN_MENU_TITLE"
+	{
+		"#format"		"{1:s}"
+		"fr"			"Quand un vip rejoint: {1}"
+		"en"			"When a vip joins: {1}"
+	}
+
+	"MenuJoinSoundsSound_ADMIN_LEAVE_MENU_TITLE"
+	{
+		"#format"		"{1:s}"
+		"fr"			"Quand un admin part: {1}"
+		"en"			"When an admin leaves: {1}"
+	}
+
+	"MenuJoinSoundsSound_VIP_LEAVE_MENU_TITLE"
+	{
+		"#format"		"{1:s}"
+		"fr"			"Quand un vip part: {1}"
+		"en"			"When a vip leaves: {1}"
+	}
+
+
+}
+

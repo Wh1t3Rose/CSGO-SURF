@@ -1,0 +1,55 @@
+"umc_mapcycle"
+{
+	"Tier 1"
+	{
+		"maps_invote" "2"
+		"surf_prelude_ksf"		{ "display"		"surf_prelude_ksf (T1 L B)" }
+		"surf_utopia_njv"		{ "display"		"surf_utopia_njv (T1 L)" }
+		"surf_utopia_night"		{ "display"		"surf_utopia_night (T1 L)" }
+		"surf_derpis_ksf"		{ "display"		"surf_derpis_ksf (T1 6S)" }
+		"surf_ninja_go_b5"		{ "display"		"surf_ninja_go_b5 (T1 2S)" }
+		"surf_legends_lite"		{ "display"		"surf_legends_lite (T1 L)" }
+		"surf_lux"			{ "display"		"surf_lux (T1 L)" }
+		"surf_aweles"			{ "display"		"surf_aweles (T1 5S)" }
+		"surf_mesa"			{ "display"		"surf_mesa (T1 L)" }
+		"surf_rebel_resistance_njv" 	{ "display"		"surf_rebel_resistance_njv (T1 L)" }
+		"surf_minuet_v1p"		{ "display"		"surf_minuet_v1p (T1 L)" }
+		"surf_rebel_scaz_csgo"		{ "display"		"surf_rebel_scaz_csgo (T1 L)" }
+		"surf_beginner"			{ "display"		"surf_beginner (T1 7S)" }
+		"surf_kitsune"			{ "display"		"surf_kitsune (T1 9S)" }
+		"surf_reprise"			{ "display"		"surf_reprise (T1 L)" }
+		"surf_aircontrol_ksf"		{ "display"		"surf_aircontrol_ksf (T1 L)" }
+		"surf_forbidden_ways_ksf"       { "display"		"surf_forbidden_ways_ksf (T1 L B)" }
+		"surf_rebel_resistance_njv" 	{ "display"		"surf_rebel_resistance_njv (T1 L)" }
+	}
+	"Tier 2"
+	{
+		"maps_invote" "2"
+		"surf_lessons"			{ "display"		"surf_lessons (T2 7S B)" }
+		"surf_rookie"			{ "display"		"surf_rookie (T2 18S)" }
+		"surf_colours"			{ "display"		"surf_colours (T2 10S)" }
+		"surf_krow10"			{ "display"		"surf_krow10 (T2 L B)" }
+		"surf_island"			{ "display"		"surf_island (T2 L)" }
+		"surf_tensile_njv"		{ "display"		"surf_tensile_njv (T2 L)" }
+		"surf_vegetables"		{ "display"		"surf_vegetables (T2 10S B)" }
+		"surf_simpsons_go_rc2"		{ "display"		"surf_simpsons_go_rc2 (T2 10S)" }
+		"surf_amplitude_light"		{ "display"		"surf_amplitude_light (T2 L)" }
+		"surf_waterworks"		{ "display"		"surf_waterworks (T2 L)" }
+		"surf_fruits"			{ "display"		"surf_fruits (T2 10S B)" }
+		"surf_ace"			{ "display"		"surf_ace (T2 8S B)" }
+		"surf_atlas_1"			{ "display"		"surf_atlas_1 (T2 L)" }
+		"surf_ethereal"        		{ "display"		"surf_ethereal (T2 4S B)" }
+	}
+	"Tier 3"
+	{
+		"maps_invote" "2"
+		"surf_kitsune2_GO"		{ "display"		"surf_kitsune2_GO (T3 12S 4B)" }
+		"surf_cookiejar"		{ "display"		"surf_cookiejar (T3 L)" }
+		"surf_boring"			{ "display"		"surf_boring (T3 16S)" }
+		"surf_coralis_ksf"		{ "display"		"surf_coralis_ksf (T3 L B)" }
+		"surf_milkyway"			{ "display"		"surf_milkyway (T3 L)" }
+		"surf_1day"			{ "display"		"surf_1day (T3 11S B)" }
+		"surf_6"			{ "display"		"surf_6 (T3 L B)" }
+		"surf_mellow"			{ "display"		"surf_mellow (T3 L)" }
+	}
+}
