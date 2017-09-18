@@ -4,7 +4,6 @@
 
 #include <store>
 #include <zephstocks>
-#include <csgocolors>
 
 new GAME_TF2 = false;
 #endif
@@ -28,10 +27,10 @@ public Sounds_OnPluginStart()
 #if defined STANDALONE_BUILD
 	new String:m_szGameDir[32];
 	GetGameFolderName(m_szGameDir, sizeof(m_szGameDir));
-
+		
 	LoadTranslations("store.phrases");
 #endif
-
+	
 	Store_RegisterHandler("sound", "path", Sounds_OnMapStart, Sounds_Reset, Sounds_Config, Sounds_Equip, Sounds_Remove, false);
 
 	HookEvent("player_say", Sounds_PlayerSay);
@@ -56,17 +55,17 @@ public Sounds_Reset()
 public Sounds_Config(&Handle:kv, itemid)
 {
 	Store_SetDataIndex(itemid, g_iSounds);
-
+	
 	KvGetString(kv, "path", g_eSounds[g_iSounds][szSound], PLATFORM_MAX_PATH);
 	KvGetString(kv, "trigger", g_eSounds[g_iSounds][szShortcut], 64);
 	g_eSounds[g_iSounds][unPrice] = KvGetNum(kv, "price");
-
+	
 	if(FileExists(g_eSounds[g_iSounds][szSound], true))
 	{
 		++g_iSounds;
 		return true;
 	}
-
+	
 	return false;
 }
 
@@ -90,7 +89,7 @@ public Action:Sounds_PlayerSay(Handle:event, const String:name[], bool:dontBroad
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	if (!client || !IsClientInGame(client))
 		return Plugin_Continue;
-
+	
 	new String:msg[256];
 	GetEventString(event, "text", STRING(msg));
 
@@ -111,7 +110,7 @@ public Action:Sounds_PlayerSay(Handle:event, const String:name[], bool:dontBroad
 			}
 			else
 			{
-				CPrintToChat(client, "%t", "Credit Not Enough");
+				Chat(client, "%t", "Credit Not Enough");
 			}
 			break;
 		}

@@ -24,6 +24,7 @@
 
 #include <dynamic/methodmaps/weblync/settings>
 #include <dynamic/methodmaps/weblync/paramcallback>
+#include <dynamic/methodmaps/weblync/link>
 
 static WebLyncSettings Settings = view_as<WebLyncSettings>(INVALID_DYNAMIC_OBJECT);
 static Dynamic ServerLinks = INVALID_DYNAMIC_OBJECT;
@@ -34,7 +35,7 @@ public Plugin myinfo =
 	name = "WebLync",
 	author = "Neuro Toxin",
 	description = "Browser redirection for CS:GO",
-	version = "0.0.8",
+	version = "0.0.11",
 	url = "https://weblync.tokenstash.com"
 }
 
@@ -48,6 +49,7 @@ public APLRes AskPluginLoad2(Handle myself, bool late, char[] error, int err_max
 public void OnPluginStart()
 {
 	LoadTranslations("webblync.phrases");
+	LoadTranslations("common.phrases");
 }
 
 public void OnAllPluginsLoaded()
@@ -55,6 +57,7 @@ public void OnAllPluginsLoaded()
 	Settings = WebLyncSettings();
 	ServerLinks = Dynamic();
 	LoadSettings();
+	SaveSettings(); // saves to new config settings on upgrade
 	RegisterCommands();
 }
 
@@ -68,6 +71,20 @@ public void OnPluginEnd()
 		
 	if (ParamCallbacks.IsValid)
 		ParamCallbacks.Dispose();
+}
+
+public void OnLibraryRemoved(const char[] name)
+{
+	if (StrEqual(name, "dynamic"))
+	{
+		SetFailState("Required plugin Dynamic has been unloaded.");
+	}
+}
+
+public void OnConfigsExecuted()
+{
+	if (Settings.ForceEnableMotd)
+		ServerCommand("sm_cvar sv_disable_motd 0");
 }
 
 public void OnMapStart()
@@ -102,6 +119,7 @@ stock void RegisterCommands()
 	RegAdminCmd("sm_weblync", OnWebLyncCommand, ADMFLAG_CONFIG, "WebLync administration menu");
 	RegAdminCmd("sm_weblyncregserver", OnWebLyncRegServerCommand, ADMFLAG_CONFIG, "Register server with WebLync API");
 	RegAdminCmd("sm_weblyncsyncserver", OnWebLyncSyncServerCommand, ADMFLAG_CONFIG, "Syncs new commands to server");
+	RegAdminCmd("sm_sendlink", OnSendLinkCommand, ADMFLAG_KICK, "Sends a link to a specified client");
 }
 
 public Action OnWebLyncCommand(int client, int args)
@@ -141,6 +159,51 @@ public Action OnWebLyncRegServerCommand(int client, int args)
 public Action OnWebLyncSyncServerCommand(int client, int args)
 {
 	GetServerLinks();
+	return Plugin_Handled;
+}
+
+public Action OnSendLinkCommand(int client, int args)
+{
+	if (args < 2)
+	{
+		ReplyToCommand(client, "[WebLync] %T", "WebLync.SendLinkCommand.Usage", LANG_SERVER);
+		return Plugin_Handled;
+	}
+	
+	char linkname[64];
+	GetCmdArg(2, linkname, sizeof(linkname));
+	Format(linkname, sizeof(linkname), "sm_%s", linkname);
+	Link link = view_as<Link>(ServerLinks.GetDynamic(linkname));
+	if (!link.IsValid || !link.Active)
+	{
+		ReplyToCommand(client, "[WebLync] %T", "WebLync.SendLinkCommand.NotRegistered", LANG_SERVER, linkname);
+		return Plugin_Handled;
+	}
+	
+	char target[64];
+	int targets[MAXPLAYERS+1];
+	char targetname[MAX_TARGET_LENGTH];
+	bool tn;
+	
+	GetCmdArg(1, target, sizeof(target));
+	int targetcount = ProcessTargetString(target, client, targets, sizeof(targets), COMMAND_FILTER_CONNECTED, targetname, sizeof(targetname), tn);
+	
+	if (targetcount <= 0)
+	{
+		ReplyToTargetError(client, targetcount);
+		return Plugin_Handled;
+	}
+	
+	for (int i = 0; i < targetcount; i++)
+	{
+		if (!IsClientInGame(targets[i]))
+			continue;
+		
+		DisplayWebLync(targets[i], linkname, true);
+		PrintToChat(targets[i], "[WebLync] %T", "WebLync.SendLinkCommand.LinkReceived", LANG_SERVER, client, linkname[3]);
+	}
+	
+	ReplyToCommand(client, "[WebLync] %T", "WebLync.SendLinkCommand.SentLink", LANG_SERVER, targetcount);
 	return Plugin_Handled;
 }
 
@@ -231,22 +294,46 @@ public int ServerLinksResponse(char[] response)
 	}
 	else if (StrContains(response, "OK ") == 0)
 	{
+		DeactivateAllLinks();
+		
 		char links[256][65];
+		Link link = view_as<Link>(INVALID_DYNAMIC_OBJECT);
 		int count = ExplodeString(response[3], " ", links, sizeof(links), sizeof(links[]), false);
 		
 		for (int i=0; i<count;i++)
 		{
-			if (ServerLinks.GetBool(links[i]))
+			link = view_as<Link>(ServerLinks.GetDynamic(links[i]));
+			if (link.IsValid)
+			{
+				link.Active = true;
 				continue;
-				
+			}
+			
 			RegConsoleCmd(links[i], OnWebLyncLinkCommand);
-			ServerLinks.SetBool(links[i], true);
+			link = Link();
+			link.SetCommand(links[i]);
+			link.Active = true;
+			ServerLinks.SetDynamic(links[i], link);
 		}
 		PrintToServer("[WebLync] %T", "WebLync.Links.Success", LANG_SERVER, count);
 	}
 	else
 	{
 		LogError("%T", "WebLync.API.InvalidResponse", LANG_SERVER, response);
+	}
+}
+
+stock void DeactivateAllLinks()
+{
+	if (!ServerLinks.IsValid)
+		return;
+	
+	Link link;
+	int count = ServerLinks.MemberCount;
+	for (int i = 0; i < count; i++)
+	{
+		link = view_as<Link>(ServerLinks.GetDynamicByIndex(i));
+		link.Active = false;
 	}
 }
 
@@ -258,7 +345,22 @@ public Action OnWebLyncLinkCommand(int client, int args)
 	return Plugin_Handled;
 }
 
-stock void DisplayWebLync(int client, const char[] linkname)
+public void OnQueryClientConvar(QueryCookie cookie, int client, ConVarQueryResult result, const char[] cvarName, const char[] cvarValue, any value)
+{
+	if (result != ConVarQuery_Okay)
+	{
+		LogError("Unable to query client convar `cl_disablehtmlmotd`");
+		return;
+	}
+	
+	Dynamic playersettings = Dynamic.GetPlayerSettings(client);
+	if (StringToInt(cvarValue) > 0)
+		playersettings.SetBool("cl_disablehtmlmotd", true);
+	else
+		playersettings.SetBool("cl_disablehtmlmotd", false);
+}
+
+stock void DisplayWebLync(int client, const char[] linkname, bool fromsendlink=false)
 {
 	char[] url = "http://weblync.tokenstash.com/api/requestlink/v0003.php";
 	Handle request = SteamWorks_CreateHTTPRequest(k_EHTTPMethodPOST, url);
@@ -280,7 +382,7 @@ stock void DisplayWebLync(int client, const char[] linkname)
 	SteamWorks_SetHTTPRequestGetOrPostParameter(request, "SteamId", SteamId);
 	SteamWorks_SetHTTPRequestGetOrPostParameter(request, "LinkName", linkname[3]);
 	
-	AddUrlReplacementsToRequest(client, request);
+	AddUrlReplacementsToRequest(client, request, fromsendlink);
 	AddThirdPartyPostReplacements(client, request);
 	
 	SteamWorks_SetHTTPCallbacks(request, OnRequestWebLyncCallback);
@@ -290,6 +392,9 @@ stock void DisplayWebLync(int client, const char[] linkname)
 		PrintToChat(client, "[WebLync] %T", "WebLync.Link.Requesting", LANG_SERVER, linkname[3]);
 		PrintToConsole(client, "[WebLync] %T", "WebLync.Link.Requesting", LANG_SERVER, linkname[3]);
 	}
+	
+	if (Settings.QueryClientMotdStatus)
+		QueryClientConVar(client, "cl_disablehtmlmotd", OnQueryClientConvar);
 }
 
 stock void DisplayWebLyncUrl(int client, const char[] url)
@@ -325,9 +430,12 @@ stock void DisplayWebLyncUrl(int client, const char[] url)
 		PrintToChat(client, "[WebLync] %T", "WebLync.Link.RequestingCustom", LANG_SERVER);
 		PrintToConsole(client, "[WebLync] %T", "WebLync.Link.RequestingCustom", LANG_SERVER);
 	}
+	
+	if (Settings.QueryClientMotdStatus)
+		QueryClientConVar(client, "cl_disablehtmlmotd", OnQueryClientConvar);
 }
 
-stock void AddUrlReplacementsToRequest(int client, Handle request)
+stock void AddUrlReplacementsToRequest(int client, Handle request, bool fromsendlink)
 {
 	char buffer[256];
 	GetClientAuthId(client, AuthId_Steam2, buffer, sizeof(buffer));
@@ -352,7 +460,16 @@ stock void AddUrlReplacementsToRequest(int client, Handle request)
 	SteamWorks_SetHTTPRequestGetOrPostParameter(request, "Client", buffer);
 	
 	GetCmdArgString(buffer, sizeof(buffer));
-	SteamWorks_SetHTTPRequestGetOrPostParameter(request, "Args", buffer);
+	if (fromsendlink)
+	{
+		char splitbuffer[3][256];
+		ExplodeString(buffer, " ", splitbuffer, sizeof(splitbuffer), sizeof(splitbuffer[]), true);
+		SteamWorks_SetHTTPRequestGetOrPostParameter(request, "Args", splitbuffer[2]);
+	}
+	else
+	{
+		SteamWorks_SetHTTPRequestGetOrPostParameter(request, "Args", buffer);
+	}
 }
 
 stock void AddThirdPartyPostReplacements(int client, Handle request)
@@ -448,6 +565,14 @@ public int ProcessWebLyncRequest(char[] response)
 		
 		if (client == 0)
 			return 0;
+			
+		Dynamic playersettings = Dynamic.GetPlayerSettings(client);
+		if (playersettings.GetBool("cl_disablehtmlmotd"))
+		{
+			PrintToChat(client, "[WebLync] %T", "WebLync.Convar.MotdDisabled", LANG_SERVER);
+			PrintToConsole(client, "[WebLync] %T", "WebLync.Convar.MotdDisabled", LANG_SERVER);
+			return 1;
+		}
 		
 		char ServerKey[65]; char UserId[16]; char SteamId[32]; char Url[512];
 		Settings.GetServerKey(ServerKey, sizeof(ServerKey));

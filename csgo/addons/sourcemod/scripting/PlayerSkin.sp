@@ -4,7 +4,7 @@
 #include <sdktools>
 //#include <n_arms_fix>
 
-#define PLUGIN_VERSION "3.5.1 (Single & Multi Flag Support)"
+#define PLUGIN_VERSION "3.6.5 (With Multi Flag Support)"
 #define PLUGIN_AUTHOR "noBrain"
 #define MAX_SKIN_PATH 256
 //flags
@@ -56,8 +56,9 @@ char g_szPlayerArmPath[MAXPLAYERS+1][MAX_SKIN_PATH];
 char weaponClass[MAXPLAYERS+1][5][32];
 //char d_gct_skin[64], d_gct_arm[64], d_gt_skin[64], d_gt_arm[64];
 char StrSkinTeam[MAXPLAYERS+1][2];
-char AdminUserFlags[MAXPLAYERS+1][4];
+//char AdminUserFlags[MAXPLAYERS+1][4];
 char ServerMapMod[32];
+char defArms[][] = { "models/weapons/ct_arms.mdl", "models/weapons/t_arms.mdl" };
 
 bool g_bUserHasSkins[MAXPLAYERS+1] = false;
 bool g_bUserHasArms[MAXPLAYERS+1];
@@ -104,7 +105,7 @@ public void OnPluginStart()
 	m_awp = CreateConVar("sm_map_awp", "0", "Give Knife + Awp To Players");
 	m_custom = CreateConVar("sm_map_custom", "0", "Give Knife + Previous Weapon To Players");
 	m_custom2 = CreateConVar("sm_map_custom2", "1", "Give Knife To Players");
-	g_smodel = CreateConVar("sm_map_mstay", "0", "remove player's selected skin on map change and needed to be chosen again.");
+	g_smodel = CreateConVar("sm_map_mstay", "1", "remove player's selected skin on map change and needed to be chosen again.");
 	g_epskin = CreateConVar("sm_pskin_enable", "1", "Enable/Disable Command pskin");
 	g_sReset = CreateConVar("sm_force_arms_change", "0", "If ture, then player's arms will reset on pick.");
 	g_gHaveCategories = CreateConVar("sm_cat_enable", "0", "Enable/Disable categories support");
@@ -119,9 +120,9 @@ public Action Command_Print(int client, int args)
 {
 	char User[32];
 	GetCmdArg(1, User, sizeof(User));
-	int target = FindTarget(client, User);
-	PrintToServer("Admin User Flag : %s", AdminUserFlags[target]);
-	PrintToServer("Server Mod Map Is %s", ServerMapMod);
+	//int target = FindTarget(client, User);
+	//PrintToServer("Admin User Flag : %s", AdminUserFlags[target]);
+	PrintToConsole(client, "Server Mod Map Is %s", ServerMapMod);
 	PrintToConsole(client, g_szPlayerSkinPath[client]);
 	PrintToConsole(client, g_szPlayerArmPath[client]);
 	int int1, int2, int3, int4;
@@ -129,13 +130,29 @@ public Action Command_Print(int client, int args)
 	int2 = GetConVarInt(m_awp);
 	int3 = GetConVarInt(m_custom);
 	int4 = GetConVarInt(m_custom2);
-	PrintToServer("Int ha Bet Tartiv %d %d %d %d", int1, int2, int3, int4);
+	PrintToConsole(client, "Int ha Bet Tartiv %d %d %d %d", int1, int2, int3, int4);
+	if(g_bUserHasArms[client])
+	{
+		PrintToConsole(client, "ARM = YES");
+	}
+	else
+	{
+		PrintToConsole(client, "ARM = NO");
+	}
+	if(g_bUserHasSkins[client])
+	{
+		PrintToConsole(client, "SKIN = YES");
+	}
+	else
+	{
+		PrintToConsole(client, "SKIN = NO");
+	}
 	return;
 }
 public void OnMapStart() 
 {
 	CreateTimer(1.0, CheckMapMod);
-	if(!GetConVarBool(g_smodel))
+	if(GetConVarInt(g_smodel) == 0)
 	{
 		for(int client = 1; client <= MaxClients; client++)
 		{
@@ -152,8 +169,8 @@ public void OnMapStart()
 	//GetConVarString(d_ct_skin, d_gct_skin, sizeof(d_gct_skin));
 	//GetConVarString(d_t_skin, d_gt_skin, sizeof(d_gt_skin));
 	
-	//PrecacheModel(d_gct_arm);
-	//PrecacheModel(d_gt_arm);
+	PrecacheModel(defArms[0]);
+	PrecacheModel(defArms[1]);
 	//PrecacheModel(d_gct_skin);
 	//PrecacheModel(d_gt_skin);
 	
@@ -216,9 +233,7 @@ public void OnMapStart()
 
 	CloseHandle(kv);
 	CloseHandle(kt);
-	Handle FileDownloader;
-	AddFilesToDownload(FileDownloader, "addons/sourcemod/configs/download_list.ini");
-	CloseHandle(FileDownloader);
+	AddFilesToDownload("addons/sourcemod/configs/download_list.ini");
 
 }
 
@@ -240,9 +255,13 @@ public Action CheckMapMod(Handle timer)
 	return Plugin_Continue;
 }
 
-public void OnClientPostAdminCheck(int client)
+/*public void OnClientPostAdminCheck(int client)
 {
-	CreateTimer(0.1, AdminCheck, client);
+	//CreateTimer(0.1, AdminCheck, client);
+	if(ApplyUserSkin(client))
+	{
+		PrintToConsole(client, "[PlayerSkin] Your skin has been set.");
+	}
 }
 
 public Action AdminCheck(Handle timer, any client)
@@ -250,15 +269,16 @@ public Action AdminCheck(Handle timer, any client)
 	if(IsUserAdmin(client))
 	{
 		//Format(AdminUserFlags[client], sizeof(AdminUserFlags[]), GetUserCFlags(client));
+		int UserFlagBitz = GetUserFlagBits(client);
 		GetUserCFlags(client, AdminUserFlags[client]);
 	}
-}
+}*/
 
-public Action PlayerDisConnect(Handle event, const char[] name, bool dontBroadcast) 
+public Action PlayerDisConnect(Event event, const char[] name, bool dontBroadcast) 
 {
 	if(!GetConVarBool(g_aDisReset))
 	{
-		int client = GetClientOfUserId(GetEventInt(event, "userid"));
+		int client = GetClientOfUserId(event.GetInt("userid"));
 		g_bUserHasSkins[client] = false;
 		g_bUserHasArms[client] = false;
 	}
@@ -267,9 +287,13 @@ public Action PlayerDisConnect(Handle event, const char[] name, bool dontBroadca
 	return Plugin_Continue;
 }
 
-public Action PlayerSpawn(Handle event, const char[] name, bool dontBroadcast) 
+public Action PlayerSpawn(Event event, const char[] name, bool dontBroadcast) 
 {
-	int client = GetClientOfUserId(GetEventInt(event, "userid"));
+	int client = GetClientOfUserId(event.GetInt("userid"));
+	if(!IsClientConnected(client) || IsFakeClient(client))
+	{
+		return;
+	}
 	if(GetConVarBool(g_aAutoShowMenu))
 	{
 		if(GetConVarBool(g_gHaveCategories))
@@ -287,7 +311,7 @@ public Action PlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
 			}
 		}
 	}
-	CreateTimer(0.2, SetSkins, GetEventInt(event, "userid"));
+	CreateTimer(0.2, SetSkins, event.GetInt("userid"));
 	if(UserCurrentTeam[client] != GetClientTeam(client))
 	{
 		g_bUserHasSkins[client] = false;
@@ -296,24 +320,25 @@ public Action PlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
 	UserCurrentTeam[client] = GetClientTeam(client);
 	if(IsUserAdmin(client) && !g_bUserHasSkins[client])
 	{
-		//bool s_gSkinFound = false;
-		//char SectionName[16];
+		bool s_gSkinFound = false;
+		char SectionName[16];
 		Handle kv = CreateKeyValues("Admin_Skins");
 		FileToKeyValues(kv, "addons/sourcemod/configs/admin_skin.ini");
-		/*
 		KvGotoFirstSubKey(kv, true);
 		do
 		{
 			KvGetSectionName(kv, SectionName, sizeof(SectionName));
-			if(StrContains(SectionName, AdminUserFlags[client], false) != -1)
+			
+			if(GetUserAcsessValue(SectionName) == GetUserFlagBits(client))
 			{
 				s_gSkinFound = true;
 				break;
 			}
 		}
 		while(s_gSkinFound == false && KvGotoNextKey(kv, true));
-		*/
-		if(KvJumpToKey(kv, AdminUserFlags[client], false))
+		
+		//if(KvJumpToKey(kv, AdminUserFlags[client], false))
+		if(s_gSkinFound)
 		{
 			int ClientTeam = GetClientTeam(client);
 			if(ClientTeam == 2)
@@ -323,18 +348,19 @@ public Action PlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
 				SkinTeam[client] = 2;
 				KvGetString(kv, "SkinT", SkinPathT, sizeof(SkinPathT));
 				KvGetString(kv, "ArmsT", ArmsPathT, sizeof(ArmsPathT));
-				if(!StrEqual(SkinPathT, ""))
+				if(!StrEqual(SkinPathT, "", false))
 				{
 					Format(g_szPlayerSkinPath[client], sizeof(g_szPlayerSkinPath[]), SkinPathT);
 					g_bUserHasSkins[client] = true;
-					if(!StrEqual(ArmsPathT, ""))
+					if(!StrEqual(ArmsPathT, "", false))
 					{
 						Format(g_szPlayerArmPath[client], sizeof(g_szPlayerArmPath[]), ArmsPathT);
 						g_bUserHasArms[client] = true;
 					}
 					else
 					{
-						g_bUserHasArms[client] = false;
+						Format(g_szPlayerArmPath[client], sizeof(g_szPlayerArmPath[]), defArms[1]);
+						g_bUserHasArms[client] = true;
 					}
 				}
 				else
@@ -349,18 +375,19 @@ public Action PlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
 				SkinTeam[client] = 3;
 				KvGetString(kv, "SkinCT", SkinPathCT, sizeof(SkinPathCT));
 				KvGetString(kv, "ArmsCT", ArmsPathCT, sizeof(ArmsPathCT));
-				if(!StrEqual(SkinPathCT, ""))
+				if(!StrEqual(SkinPathCT, "", false))
 				{
 					Format(g_szPlayerSkinPath[client], sizeof(g_szPlayerSkinPath[]), SkinPathCT);
 					g_bUserHasSkins[client] = true;
-					if(!StrEqual(ArmsPathCT, ""))
+					if(!StrEqual(ArmsPathCT, "", false))
 					{
 						Format(g_szPlayerArmPath[client], sizeof(g_szPlayerArmPath[]), ArmsPathCT);
 						g_bUserHasArms[client] = true;
 					}
 					else
 					{
-						g_bUserHasArms[client] = false;
+						Format(g_szPlayerArmPath[client], sizeof(g_szPlayerArmPath[]), defArms[0]);
+						g_bUserHasArms[client] = true;
 					}
 				}
 				else
@@ -385,22 +412,24 @@ public Action PlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
 				SkinTeam[client] = 2;
 				KvGetString(kv, "SkinT", SkinPathT, sizeof(SkinPathT));
 				KvGetString(kv, "ArmsT", ArmsPathT, sizeof(ArmsPathT));
-				if(!StrEqual(SkinPathT, ""))
+				if(!StrEqual(SkinPathT, "", false))
 				{
 					Format(g_szPlayerSkinPath[client], sizeof(g_szPlayerSkinPath[]), SkinPathT);
 					g_bUserHasSkins[client] = true;
-					if(!StrEqual(ArmsPathT, ""))
+					if(!StrEqual(ArmsPathT, "", false))
 					{
 						Format(g_szPlayerArmPath[client], sizeof(g_szPlayerArmPath[]), ArmsPathT);
 						g_bUserHasArms[client] = true;
 					}
 					else
 					{
-						g_bUserHasArms[client] = false;
+						Format(g_szPlayerArmPath[client], sizeof(g_szPlayerArmPath[]), defArms[1]);
+						g_bUserHasArms[client] = true;
 					}
 				}
 				else
 				{
+					g_bUserHasArms[client] = false;
 					g_bUserHasSkins[client] = false;
 				}
 			}
@@ -411,23 +440,25 @@ public Action PlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
 				SkinTeam[client] = 3;
 				KvGetString(kv, "SkinCT", SkinPathCT, sizeof(SkinPathCT));
 				KvGetString(kv, "ArmsCT", ArmsPathCT, sizeof(ArmsPathCT));
-				if(!StrEqual(SkinPathCT, ""))
+				if(!StrEqual(SkinPathCT, "", false))
 				{
 					Format(g_szPlayerSkinPath[client], sizeof(g_szPlayerSkinPath[]), SkinPathCT);
 					g_bUserHasSkins[client] = true;
-					if(!StrEqual(ArmsPathCT, ""))
+					if(!StrEqual(ArmsPathCT, "", false))
 					{
 						Format(g_szPlayerArmPath[client], sizeof(g_szPlayerArmPath[]), ArmsPathCT);
 						g_bUserHasArms[client] = true;
 					}
 					else
 					{
-						g_bUserHasArms[client] = false;
+						Format(g_szPlayerArmPath[client], sizeof(g_szPlayerArmPath[]), defArms[0]);
+						g_bUserHasArms[client] = true;
 					}
 				}
 				else
 				{
 					g_bUserHasSkins[client] = false;
+					g_bUserHasArms[client] = false;
 				}
 			}
 		}
@@ -442,7 +473,7 @@ public Action PlayerSpawn(Handle event, const char[] name, bool dontBroadcast)
 
 }
 
-public Action RoundPreChange(Handle event, const char[] name, bool dontBroadcast) 
+public Action RoundPreChange(Event event, const char[] name, bool dontBroadcast) 
 {
 	IsRoundFresh = true;
 	if(GetConVarBool(g_cFix)) 
@@ -459,7 +490,7 @@ public Action RoundPreChange(Handle event, const char[] name, bool dontBroadcast
 	return Plugin_Continue;
 }
 
-public Action RoundStart(Handle event, const char[] name, bool dontBroadcast) 
+public Action RoundStart(Event event, const char[] name, bool dontBroadcast) 
 {
 	CreateTimer(0.3, GiveWeapons);
 	return Plugin_Continue;
@@ -546,9 +577,9 @@ public Action GiveWeapons(Handle timer)
 	return Plugin_Continue;
 }
 
-public Action PlayerDeath(Handle event, const char[] name, bool dontBroadcast) 
+public Action PlayerDeath(Event event, const char[] name, bool dontBroadcast) 
 {
-	int client = GetClientOfUserId(GetEventInt(event, "userid"));
+	int client = GetClientOfUserId(event.GetInt("userid"));
 	for(int slot = 0; slot <= 4; slot++)
 	{
 		playerWeapons[client][slot] = -1;
@@ -1032,29 +1063,38 @@ stock void GiveClientWeapons(int client)
 
 public int GetRandomPlayer(int team)
 {
-    int RandomClient;
 
+	int RandomClient;
+	if(GetTeamClientCount(team) > 0)
+	{
+		do
+		{
+			RandomClient = GetRandomInt(1, MaxClients);
+		}
+		while(!IsClientInGame(RandomClient) || GetClientTeam(RandomClient) != team);
+		return RandomClient;
+	}
+	else
+		return -1;
+/*
     ArrayList ValidClients = new ArrayList();
     
-    for(int i = 1; i < MaxClients; i++)
+    for(int i = 1; i <= MaxClients; i++)
     {
         if(IsValidClient(i) && GetClientTeam(i) == team)
         {
             ValidClients.Push(i);
         }
     }
-    
-    RandomClient = ValidClients.Get(GetRandomInt(0, ValidClients.Length - 1));
+    int Index = GetRandomInt(0, ValidClients.Length - 1);
+	
+    RandomClient = ValidClients.Get(Index);
     
     delete ValidClients;
   
     return RandomClient;
+*/
 }
-
-stock bool IsValidClient(int client) 
-{ 
-    return (1 <= client <= MaxClients && IsClientInGame(client) && !IsClientSourceTV(client)); 
-} 
 stock void GiveC4()
 {
 	char WeaponName[32];
@@ -1073,6 +1113,7 @@ stock void GiveC4()
 						if(StrEqual(WeaponName, "weapon_c4"))
 						{
 							RemovePlayerItem(i, ent);
+							AcceptEntityInput(ent, "Kill");
 						}
 					}
 				}
@@ -1084,6 +1125,8 @@ stock void GiveC4()
 public Action GiveBomb(Handle timer)
 {
 	int user = GetRandomPlayer(2);
+	if(user == -1)
+		return Plugin_Stop;
 	GivePlayerItem(user, "weapon_c4");
 	PrintToChat(user, " \x10[PlayerSkin] \x01You are now holding the bomb!");
 }
@@ -1209,10 +1252,10 @@ public Action Arms_Job(Handle timer, any client)
        weaponClass[client][slot] = "";
 	}
 }
-stock void AddFilesToDownload(Handle FileHandle, char[] Path)
+stock void AddFilesToDownload(char[] Path)
 {
 	char PathOfFile[512];
-	FileHandle = OpenFile(Path, "r");
+	Handle FileHandle = OpenFile(Path, "r");
 	while(ReadFileLine(FileHandle, PathOfFile, sizeof(PathOfFile)) && !IsEndOfFile(FileHandle))
 	{
 		if(strlen(PathOfFile) > 0 && IsValidFile(PathOfFile))
@@ -1500,7 +1543,7 @@ stock int GetUserAcsessValue(char[] flags)
 	{
 		UserFlagNum = UserFlagNum + 65536;
 	}
-	if(StrContains(flags, "1", false) != -1)
+	if(StrContains(flags, "q", false) != -1)
 	{
 		UserFlagNum = UserFlagNum + 131072;
 	}
@@ -1531,6 +1574,38 @@ bool CheckModelChange(int client, char[] StockModel)
 		return false;
 	}
 }
+/*bool ApplyUserSkin(int client)
+{
+	char SteamAuth[32];
+	GetClientAuthId(client, AuthId_Steam2, SteamAuth, sizeof(SteamAuth));
+	Handle kv = CreateKeyValues("userids");
+	FileToKeyValues(kv, "addons/sourcemod/configs/user_skins.ini");
+	if(KvJumpToKey(kv, SteamAuth, false))
+	{
+		char z_mSkins[128], z_mArms[128];
+		KvGetString(kv, "Skin", z_mSkins, sizeof(z_mSkins));
+		KvGetString(kv, "Arms", z_mArms, sizeof(z_mArms));
+		if(!StrEqual(z_mSkins, ""))
+		{
+			Format(g_szPlayerSkinPath[client], sizeof(g_szPlayerSkinPath[]), z_mSkins);
+			g_bUserHasSkins[client] = true;
+			if(!StrEqual(z_mArms, ""))
+			{
+				Format(g_szPlayerArmPath[client], sizeof(g_szPlayerSkinPath[]), z_mArms);
+				g_bUserHasArms[client] = true;
+			}
+			CloseHandle(kv);
+			return true;
+		}
+	}
+	CloseHandle(kv);
+	return false;
+}*/
+
+
+
+
+
 
 
 

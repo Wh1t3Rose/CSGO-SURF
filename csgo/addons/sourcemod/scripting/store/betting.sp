@@ -4,7 +4,6 @@
 
 #include <store>
 #include <zephstocks>
-#include <csgocolors>
 
 new GAME_CSS = false;
 new GAME_CSGO = false;
@@ -30,7 +29,7 @@ public Betting_OnPluginStart()
 #if defined STANDALONE_BUILD
 	new String:m_szGameDir[32];
 	GetGameFolderName(m_szGameDir, sizeof(m_szGameDir));
-
+	
 	if(strcmp(m_szGameDir, "cstrike")==0)
 		GAME_CSS = true;
 	else if(strcmp(m_szGameDir, "csgo")==0)
@@ -85,14 +84,14 @@ public Action:Command_Bet(client, args)
 
 	if(g_iBettingStart+g_eCvars[g_cvarBettingPeriod][aCache] < GetTime())
 	{
-		CPrintToChat(client, "%t", "Betting Period Over");
+		Chat(client, "%t", "Betting Period Over");
 		return Plugin_Handled;
 	}
 
-
+		
 	if(g_iPlayerPot[client]>0)
 	{
-		CPrintToChat(client, "%t", "Betting Already Placed");
+		Chat(client, "%t", "Betting Already Placed");
 		return Plugin_Handled;
 	}
 
@@ -108,7 +107,7 @@ public Action:Command_Bet(client, args)
 
 	if(!(0<m_iCredits<=Store_GetClientCredits(client)))
 	{
-		CPrintToChat(client, "%t", "Credit Invalid Amount");
+		Chat(client, "%t", "Credit Invalid Amount");
 		return Plugin_Handled;
 	}
 
@@ -118,14 +117,14 @@ public Action:Command_Bet(client, args)
 		g_iPlayerTeam[client]=3;
 	else
 	{
-		CPrintToChat(client, "%t", "Betting Invalid Team");
+		Chat(client, "%t", "Betting Invalid Team");
 		return Plugin_Handled;
 	}
 
 	g_iPlayerPot[client] = m_iCredits;
 	Store_SetClientCredits(client, Store_GetClientCredits(client)-m_iCredits);
 
-	CPrintToChat(client, "%t", "Betting Placed", m_iCredits);
+	Chat(client, "%t", "Betting Placed", m_iCredits);
 
 	return Plugin_Handled;
 }
@@ -185,10 +184,10 @@ public Action:Betting_RoundEnd(Handle:event,const String:name[],bool:dontBroadca
 			if(g_iPlayerTeam[i] == m_iWinner)
 			{
 				Store_SetClientCredits(i, Store_GetClientCredits(i)+RoundFloat(g_iPlayerPot[i]*m_fMultiplier));
-				CPrintToChat(i, "%t", "Betting Won", RoundFloat(g_iPlayerPot[i]*m_fMultiplier));
+				Chat(i, "%t", "Betting Won", RoundFloat(g_iPlayerPot[i]*m_fMultiplier));
 			}
 			else
-				CPrintToChat(i, "%t", "Betting Lost", g_iPlayerPot[i]);
+				Chat(i, "%t", "Betting Lost", g_iPlayerPot[i]);
 		}
 		g_iPlayerPot[i]=0;
 		g_iPlayerTeam[i]=0;

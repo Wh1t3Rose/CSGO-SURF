@@ -23,7 +23,6 @@
 #undef REQUIRE_PLUGIN
 #include <store>
 #include <zephstocks>
-#include <csgocolors>
 
 //////////////////////////////
 //			ENUMS			//
@@ -55,7 +54,7 @@ new Handle:g_hReadyTimers[MAXPLAYERS+1] = {INVALID_HANDLE};
 //		PLUGIN DEFINITION		//
 //////////////////////////////////
 
-public Plugin:myinfo =
+public Plugin:myinfo = 
 {
 	name = PLUGIN_NAME,
 	author = PLUGIN_AUTHOR,
@@ -133,7 +132,7 @@ public Action:Command_Offer(client, args)
 {
 	if(!g_iTraders[client])
 	{
-		CPrintToChat(client, "%t", "Trade Not Active");
+		Chat(client, "%t", "Trade Not Active");
 		return Plugin_Handled;
 	}
 
@@ -143,7 +142,7 @@ public Action:Command_Offer(client, args)
 	new m_iCredits = StringToInt(m_szCredits);
 	if(m_iCredits < 0 || Store_GetClientCredits(client) < m_iCredits)
 	{
-		CPrintToChat(client, "%t", "Credit Invalid Amount");
+		Chat(client, "%t", "Credit Invalid Amount");
 		return Plugin_Handled;
 	}
 
@@ -158,14 +157,14 @@ public Action:Command_Trade(client, args)
 {
 	if(g_iTraders[client])
 	{
-		//CPrintToChat(client, "%t", "Trade Active");
+		//Chat(client, "%t", "Trade Active");
 		DisplayTradeMenu(client);
 		return Plugin_Handled;
 	}
 
 	if(g_iTradeCooldown[client] > GetTime())
 	{
-		CPrintToChat(client, "%t", "Trade Cooldown");
+		Chat(client, "%t", "Trade Cooldown");
 		return Plugin_Handled;
 	}
 
@@ -202,7 +201,7 @@ public ResetTrade(client)
 
 	g_bReady[client] = false;
 	g_iTraders[client] = 0;
-	g_iOfferedCredits[client] = 0;
+	g_iOfferedCredits[client] = 0; 
 	ClearTimer(g_hReadyTimers[client]);
 	g_hReadyTimers[target] = INVALID_HANDLE;
 	for(new i=0;i<STORE_TRADE_MAX_OFFERS;++i)
@@ -221,7 +220,7 @@ public MenuHandler_SelectPlayer(Handle:menu, MenuAction:action, client, param2)
 		new target = GetClientOfUserId(StringToInt(m_szUserId));
 		if(!target || !IsClientInGame(target))
 		{
-			CPrintToChat(client, "%t", "Player left");
+			Chat(client, "%t", "Player left");
 			Command_Trade(client, 0);
 			return;
 		}
@@ -229,7 +228,7 @@ public MenuHandler_SelectPlayer(Handle:menu, MenuAction:action, client, param2)
 		g_iTradeCooldown[client] = GetTime() + g_eCvars[g_cvarTradeCooldown][aCache];
 		g_iTraders[client] = GetClientUserId(target);
 
-		CPrintToChat(client, "%t", "Waiting for confirmation");
+		Chat(client, "%t", "Waiting for confirmation");
 		new Handle:m_hMenu = CreateMenu(MenuHandler_InitTrade);
 		SetMenuTitle(m_hMenu, "%t", "Trade Confirm", client);
 		SetMenuExitButton(m_hMenu, false);
@@ -249,7 +248,7 @@ public MenuHandler_InitTrade(Handle:menu, MenuAction:action, client, param2)
 		{
 			if(g_iTraders[i] == GetClientUserId(client))
 			{
-				CPrintToChat(i, "%t", "Trade Refused", client);
+				Chat(i, "%t", "Trade Refused", client);
 				g_iTraders[i] = 0;
 				return;
 			}
@@ -272,13 +271,13 @@ public MenuHandler_InitTrade(Handle:menu, MenuAction:action, client, param2)
 
 		if(param2 == 1)
 		{
-			CPrintToChat(target, "%t", "Trade Refused", client);
+			Chat(target, "%t", "Trade Refused", client);
 			return;
 		}
 
 		if(!target)
 		{
-			CPrintToChat(client, "%t", "Player left");
+			Chat(client, "%t", "Player left");
 			return;
 		}
 
@@ -344,7 +343,7 @@ public DisplayPartnerMenu(client)
 
 	if(!g_bMenuOpen[client])
 	{
-		CPrintToChat(client, "%t", "Trade Menu");
+		Chat(client, "%t", "Trade Menu");
 	}
 
 	decl String:m_szMessage[256];
@@ -459,7 +458,7 @@ public Action:Timer_ReadyTimer(Handle:timer, any:data)
 		if(g_hReadyTimers[i] == timer)
 		{
 			if(data > 0)
-				CPrintToChat(i, "%t", "Ready Timer", data);
+				Chat(i, "%t", "Ready Timer", data);
 			if(client == 0)
 				client = i;
 			else
@@ -486,8 +485,8 @@ public Action:Timer_ReadyTimer(Handle:timer, any:data)
 		ResetTrade(target);
 		ResetTrade(client);
 
-		CPrintToChat(target, "%t", "Trade Successful");
-		CPrintToChat(client, "%t", "Trade Successful");
+		Chat(target, "%t", "Trade Successful");
+		Chat(client, "%t", "Trade Successful");
 
 		if(g_bMenuOpen[client] == true)
 			CancelClientMenu(client);
@@ -514,7 +513,7 @@ public MenuHandler_Cancel(Handle:menu, MenuAction:action, client, param2)
 			if(!target || !IsClientInGame(target))
 				return;
 			ResetTrade(target);
-			CPrintToChat(target, "%t", "Trade Cancelled");
+			Chat(target, "%t", "Trade Cancelled");
 		}
 		else
 			DisplayTradeMenu(client);

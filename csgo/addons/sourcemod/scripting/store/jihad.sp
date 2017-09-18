@@ -4,7 +4,6 @@
 
 #include <store>
 #include <zephstocks>
-#include <csgocolors>
 #endif
 
 enum Jihad
@@ -49,7 +48,7 @@ public Jihad_OnConfigsExecuted()
 		Format(STRING(m_szSound), "sound/%s", g_eCvars[g_cvarJihadExplosionSound][sCache]);
 		AddFileToDownloadsTable(m_szSound);
 	}
-
+	
 	if(g_eCvars[g_cvarJihadBeforeSound][sCache][0]!=0 && FileExists(g_eCvars[g_cvarJihadBeforeSound][sCache], true))
 	{
 		PrecacheSound(g_eCvars[g_cvarJihadBeforeSound][sCache]);
@@ -71,7 +70,7 @@ public Jihad_Reset()
 public Jihad_Config(&Handle:kv, itemid)
 {
 	Store_SetDataIndex(itemid, g_iJihads);
-
+	
 	g_eJihads[g_iJihads][flRadius] = KvGetFloat(kv, "radius");
 	g_eJihads[g_iJihads][flDamage] = KvGetFloat(kv, "damage");
 	g_eJihads[g_iJihads][bSilent] = (KvGetNum(kv, "silent")?true:false);
@@ -85,17 +84,17 @@ public Jihad_Config(&Handle:kv, itemid)
 public Jihad_Equip(client, id)
 {
 	new m_iData = Store_GetDataIndex(id);
-
+	
 	if(g_eCvars[g_cvarJihadTeam][aCache] != 0 && g_eCvars[g_cvarJihadTeam][aCache]!=GetClientTeam(client))
 	{
-		CPrintToChat(client, "%t", "Jihad Wrong Team");
+		Chat(client, "%t", "Jihad Wrong Team");
 		return 1;
 	}
 
 	if(!g_eJihads[m_iData][bSilent])
 		if(g_eCvars[g_cvarJihadBeforeSound][sCache][0]!=0)
 			EmitAmbientSound(g_eCvars[g_cvarJihadBeforeSound][sCache], NULL_VECTOR, client);
-
+	
 	new Handle:data = CreateDataPack();
 	WritePackCell(data, GetClientUserId(client));
 	WritePackCell(data, m_iData);
@@ -121,17 +120,17 @@ public Action:Jihad_TriggerBomb(Handle:timer, any:data)
 	if(!client || !IsClientInGame(client) || !IsPlayerAlive(client))
 		return Plugin_Stop;
 
-
+	
 
 	if(GetRandomFloat() <= g_eJihads[m_iData][flFailrate])
 	{
-		CPrintToChat(client, "%t", "Jihad Failed");
+		Chat(client, "%t", "Jihad Failed");
 		return Plugin_Stop;
 	}
-
+	
 	if(g_eCvars[g_cvarJihadBeforeSound][sCache][0]!=0)
 		EmitAmbientSound(g_eCvars[g_cvarJihadExplosionSound][sCache], NULL_VECTOR, client);
-
+	
 	new Float:m_flPos[3];
 	new Float:m_flPos2[3];
 	new Float:m_flPush[3];
@@ -140,7 +139,7 @@ public Action:Jihad_TriggerBomb(Handle:timer, any:data)
 
 	TE_SetupSmoke(m_flPos, g_iExplosion, 10.0, 10);
 	TE_SendToAll();
-
+	
 
 	new Handle:m_hData = CreateDataPack();
 	WritePackCell(m_hData, 0);
@@ -152,16 +151,16 @@ public Action:Jihad_TriggerBomb(Handle:timer, any:data)
 	ResetPack(m_hData);
 
 	CreateTimer(0.0, ExplodePlayer, m_hData);
-
+	
 	new Float:m_flDistance;
 	LoopAlivePlayers(i)
 	{
 		if(!g_eCvars[g_cvarJihadTK][aCache] && GetClientTeam(i)==GetClientTeam(client))
 			continue;
-
+		
 		GetClientAbsOrigin(i, m_flPos2);
 		m_flDistance = GetVectorDistance(m_flPos, m_flPos2);
-
+		
 		if(m_flDistance <= g_eJihads[m_iData][flRadius])
 		{
 			MakeVectorFromPoints(m_flPos, m_flPos2, m_flPush);

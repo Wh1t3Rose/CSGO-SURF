@@ -4,7 +4,6 @@
 
 #include <store>
 #include <zephstocks>
-#include <csgocolors>
 #endif
 
 new Float:g_flGodmodes[STORE_MAX_ITEMS];
@@ -58,7 +57,7 @@ public Godmode_Reset()
 public Godmode_Config(&Handle:kv, itemid)
 {
 	Store_SetDataIndex(itemid, g_iGodmodes);
-
+	
 	g_flGodmodes[g_iGodmodes] = KvGetFloat(kv, "duration");
 
 	++g_iGodmodes;
@@ -69,13 +68,13 @@ public Godmode_Equip(client, id)
 {
 	if(g_iGodmodeRoundLimit[client] == g_eCvars[g_cvarGodmodeRoundLimit][aCache])
 	{
-		CPrintToChat(client, "%t", "Godmode Round Limit");
+		Chat(client, "%t", "Godmode Round Limit");
 		return 1;
 	}
 
 	if(g_eCvars[g_cvarGodmodeTeam][aCache] != 0 && g_eCvars[g_cvarGodmodeTeam][aCache]!=GetClientTeam(client))
 	{
-		CPrintToChat(client, "%t", "Godmode Wrong Team");
+		Chat(client, "%t", "Godmode Wrong Team");
 		return 1;
 	}
 

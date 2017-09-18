@@ -103,4 +103,42 @@
 		"ru"		"Открытие ссылки..."
 		"tr"		"Link Açılıyor..."
 	}
+	"WebLync.Convar.MotdDisabled"
+	{
+		"en"		"You must enable HTML MOTD by typing `cl_disablehtmlmotd 0` into your game console."
+		"fr"		"Vous devez activer HTML MOTD en tapant `cl_disablehtmlmotd 0` dans votre console de jeu."
+		"ru"		"Вы должны включить HTML MOTD, введя `cl_disablehtmlmotd 0` в свою игровую консоль."
+		"tr"		"HTML MOTD'yi, oyun konsolunuza `cl_disablehtmlmotd 0` yazarak etkinleştirmelisiniz."
+	}
+	"WebLync.SendLinkCommand.Usage"
+	{
+		"en"		"Usage: sm_sendlink <target> <linkname> <args>."
+		"fr"		"Usage: sm_sendlink <target> <linkname> <args>."
+		"ru"		"Применение: sm_sendlink <target> <linkname> <args>."
+		"tr"		"Kullanım: sm_sendlink <target> <linkname> <args>."
+	}
+	"WebLync.SendLinkCommand.NotRegistered"
+	{
+		"#format"	"{1:s}"
+		"en"		"Link '{1}' is not registered."
+		"fr"		"Le lien '{1}' n'est pas enregistré."
+		"ru"		"Ссылка '{1}' не зарегистрирована."
+		"tr"		"Link '{1}' kaydedilmedi."
+	}
+	"WebLync.SendLinkCommand.LinkReceived"
+	{
+		"#format"	"{1:N}{2:s}"
+		"en"		"{1} sent you a link ({2})."
+		"fr"		"{1} vous a envoyé un lien ({2})."
+		"ru"		"{1} отправил вам ссылку ({2})."
+		"tr"		"{1} size bir bağlantı gönderdi ({2})."
+	}
+	"WebLync.SendLinkCommand.SentLink"
+	{
+		"#format"	"{1:d}"
+		"en"		"Link sent to {1} client(s)."
+		"fr"		"Lien envoyé à {1} client(s)."
+		"ru"		"Ссылка отправлена {1} клиентам."
+		"tr"		"Link, {1} müşteri (ler) e gönderildi."
+	}
 }

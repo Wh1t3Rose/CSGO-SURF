@@ -70,7 +70,7 @@ methodmap WebLyncParamCallback < Dynamic
 		}
 	}
 
-	property int Callback
+	property Function Callback
 	{
 		public get()
 		{
@@ -81,9 +81,9 @@ methodmap WebLyncParamCallback < Dynamic
 				if (offset == INVALID_DYNAMIC_OFFSET)
 					SetFailState("A serious error occured in Dynamic!");
 			}
-			return this.GetIntByOffset(offset);
+			return this.GetFunctionByOffset(offset);
 		}
-		public set(int value)
+		public set(Function value)
 		{
 			static DynamicOffset offset = INVALID_DYNAMIC_OFFSET;
 			if (offset == INVALID_DYNAMIC_OFFSET)
@@ -91,11 +91,11 @@ methodmap WebLyncParamCallback < Dynamic
 				offset = this.GetMemberOffset("Callback");
 				if (offset == INVALID_DYNAMIC_OFFSET)
 				{
-					offset = this.SetInt("Callback", value);
+					offset = this.SetFunction("Callback", value);
 					return;
 				}
 			}
-			this.SetIntByOffset(offset, value);
+			this.SetFunctionByOffset(offset, value);
 		}
 	}
 }

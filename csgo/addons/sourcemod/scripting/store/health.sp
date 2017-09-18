@@ -4,7 +4,6 @@
 
 #include <store>
 #include <zephstocks>
-#include <csgocolors>
 #endif
 
 new g_iHealths[STORE_MAX_ITEMS];
@@ -62,7 +61,7 @@ public Health_Reset()
 public Health_Config(&Handle:kv, itemid)
 {
 	Store_SetDataIndex(itemid, g_iHealthIdx);
-
+	
 	g_iHealths[g_iHealthIdx] = KvGetNum(kv, "health");
 
 	++g_iHealthIdx;
@@ -73,7 +72,7 @@ public Health_Equip(client, id)
 {
 	if(g_iRoundLimit[client] == g_eCvars[g_cvarHealthRoundLimit][aCache])
 	{
-		CPrintToChat(client, "%t", "Health Round Limit");
+		Chat(client, "%t", "Health Round Limit");
 		return 1;
 	}
 

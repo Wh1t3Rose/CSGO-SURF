@@ -4,7 +4,6 @@
 
 #include <store>
 #include <zephstocks>
-#include <csgocolors>
 
 new GAME_TF2 = false;
 #endif
@@ -45,13 +44,13 @@ public PlayerSkins_OnPluginStart()
 #if defined STANDALONE_BUILD
 	new String:m_szGameDir[32];
 	GetGameFolderName(m_szGameDir, sizeof(m_szGameDir));
-
+	
 	if(strcmp(m_szGameDir, "tf")==0)
 		GAME_TF2 = true;
-
+		
 	LoadTranslations("store.phrases");
 #endif
-
+	
 	Store_RegisterHandler("playerskin", "model", PlayerSkins_OnMapStart, PlayerSkins_Reset, PlayerSkins_Config, PlayerSkins_Equip, PlayerSkins_Remove, true);
 	Store_RegisterHandler("playerskin_temp", "model", PlayerSkins_OnMapStart, PlayerSkins_Reset, PlayerSkins_Config, PlayerSkins_Equip, PlayerSkins_Remove, false);
 
@@ -60,7 +59,7 @@ public PlayerSkins_OnPluginStart()
 	g_cvarSkinForceChangeCT = RegisterConVar("sm_store_playerskin_default_ct", "", "Path of the default CT skin.", TYPE_STRING);
 	g_cvarSkinForceChangeT = RegisterConVar("sm_store_playerskin_default_t", "", "Path of the default T skin.", TYPE_STRING);
 	g_cvarSkinDelay = RegisterConVar("sm_store_playerskin_delay", "-1", "Delay after spawn before applying the skin. -1 means no delay", TYPE_FLOAT);
-
+	
 	HookEvent("player_spawn", PlayerSkins_PlayerSpawn);
 	HookEvent("player_death", PlayerSkins_PlayerDeath);
 
@@ -72,7 +71,7 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 {
 	MarkNativeAsOptional("ZR_IsClientZombie");
 	return APLRes_Success;
-}
+} 
 #endif
 
 public PlayerSkins_OnMapStart()
@@ -97,7 +96,7 @@ public PlayerSkins_OnMapStart()
 	}
 	else
 		g_bTForcedSkin = false;
-
+		
 	if(g_eCvars[g_cvarSkinForceChangeCT][sCache][0] != 0 && (FileExists(g_eCvars[g_cvarSkinForceChangeCT][sCache]) || FileExists(g_eCvars[g_cvarSkinForceChangeCT][sCache], true)))
 	{
 		g_bCTForcedSkin = true;
@@ -135,19 +134,19 @@ public PlayerSkins_Reset()
 public PlayerSkins_Config(&Handle:kv, itemid)
 {
 	Store_SetDataIndex(itemid, g_iPlayerSkins);
-
+	
 	KvGetString(kv, "model", g_ePlayerSkins[g_iPlayerSkins][szModel], PLATFORM_MAX_PATH);
 	KvGetString(kv, "arms", g_ePlayerSkins[g_iPlayerSkins][szArms], PLATFORM_MAX_PATH);
 	g_ePlayerSkins[g_iPlayerSkins][iSkin] = KvGetNum(kv, "skin");
 	g_ePlayerSkins[g_iPlayerSkins][iTeam] = KvGetNum(kv, "team");
 	g_ePlayerSkins[g_iPlayerSkins][bTemporary] = (KvGetNum(kv, "temporary")?true:false);
-
+	
 	if(FileExists(g_ePlayerSkins[g_iPlayerSkins][szModel], true))
 	{
 		++g_iPlayerSkins;
 		return true;
 	}
-
+	
 	return false;
 }
 
@@ -156,13 +155,13 @@ public PlayerSkins_Equip(client, id)
 	new m_iData = Store_GetDataIndex(id);
 	if(g_eCvars[g_cvarSkinChangeInstant][aCache] && IsPlayerAlive(client) && GetClientTeam(client)==g_ePlayerSkins[m_iData][iTeam])
 	{
-
+		
 		Store_SetClientModel(client, g_ePlayerSkins[m_iData][szModel], g_ePlayerSkins[m_iData][iSkin]);
 	}
 	else
 	{
 		if(Store_IsClientLoaded(client))
-			CPrintToChat(client, "%t", "PlayerSkins Settings Changed");
+			Chat(client, "%t", "PlayerSkins Settings Changed");
 
 		if(g_ePlayerSkins[m_iData][bTemporary])
 		{
@@ -176,7 +175,7 @@ public PlayerSkins_Equip(client, id)
 public PlayerSkins_Remove(client, id)
 {
 	if(Store_IsClientLoaded(client) && !g_eCvars[g_cvarSkinChangeInstant][aCache])
-		CPrintToChat(client, "%t", "PlayerSkins Settings Changed");
+		Chat(client, "%t", "PlayerSkins Settings Changed");
 	return g_ePlayerSkins[Store_GetDataIndex(id)][iTeam]-2;
 }
 
@@ -185,7 +184,7 @@ public Action:PlayerSkins_PlayerSpawn(Handle:event,const String:name[],bool:dont
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	if(!IsClientInGame(client) || !IsPlayerAlive(client) || !(2<=GetClientTeam(client)<=3))
 		return Plugin_Continue;
-
+			
 	new Float:Delay = Float:g_eCvars[g_cvarSkinDelay][aCache];
 
 	if(Delay < 0 && g_bZombieMode)
@@ -205,6 +204,10 @@ public Action:PlayerSkins_PlayerSpawnPost(Handle:timer, any:userid)
 	if(!client)
 		return Plugin_Stop;
 
+	if(g_bZombieMode)
+		if(ZR_IsClientZombie(client))
+			return Plugin_Continue;
+		
 	new m_iEquipped = Store_GetEquippedItem(client, "playerskin", 2);
 	if(m_iEquipped < 0)
 		m_iEquipped = Store_GetEquippedItem(client, "playerskin", GetClientTeam(client)-2);
@@ -230,10 +233,6 @@ public Action:PlayerSkins_PlayerSpawnPost(Handle:timer, any:userid)
 
 Store_SetClientModel(client, const String:model[], const skin=0, const String:arms[]="")
 {
-	if(g_bZombieMode)
-		if(ZR_IsClientZombie(client))
-			return;
-
 	if(GAME_TF2)
 	{
 		SetVariantString(model);

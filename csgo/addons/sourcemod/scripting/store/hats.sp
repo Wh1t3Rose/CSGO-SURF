@@ -6,7 +6,6 @@
 
 #include <sdkhooks>
 #include <thirdperson>
-#include <csgocolors>
 
 #undef REQUIRE_EXTENSIONS
 #include <store>
@@ -46,7 +45,7 @@ public Hats_OnPluginStart()
 #endif
 {
 #if !defined STANDALONE_BUILD
-	// This is not a standalone build, we don't want hats to kill the whole plugin for us
+	// This is not a standalone build, we don't want hats to kill the whole plugin for us	
 	if(GetExtensionFileStatus("sdkhooks.ext")!=1)
 	{
 		LogError("SDKHooks isn't installed or failed to load. Hats will be disabled. Please install SDKHooks. (https://forums.alliedmods.net/showthread.php?t=106748)");
@@ -70,19 +69,19 @@ public Hats_OnPluginStart()
 	PrepSDKCall_AddParameter(SDKType_String, SDKPass_Pointer);
 	g_hLookupAttachment = EndPrepSDKCall();
 	CloseHandle(m_hGameConf);
-
+		
 	if(!g_hLookupAttachment && !GAME_CSGO)
 	{
 		LogError("LookupAttachment signature is out of date or not supported in this game. Hats will be disabled. Please contact the author.");
 		return;
 	}
-
+	
 	Store_RegisterHandler("hat", "model", Hats_OnMapStart, Hats_Reset, Hats_Config, Hats_Equip, Hats_Remove, true);
-
+		
 	g_cvarDefaultT = RegisterConVar("sm_store_hats_default_t", "models/player/t_leet.mdl", "Terrorist model that supports hats", TYPE_STRING);
 	g_cvarDefaultCT = RegisterConVar("sm_store_hats_default_ct", "models/player/ct_urban.mdl", "Counter-Terrorist model that supports hats", TYPE_STRING);
 	g_cvarOverrideEnabled = RegisterConVar("sm_store_hats_skin_override", "0", "Allow the store to override player model if it doesn't support hats", TYPE_INT);
-
+	
 	HookEvent("player_spawn", Hats_PlayerSpawn);
 	HookEvent("player_death", Hats_PlayerRemoveEvent);
 	HookEvent("player_team", Hats_PlayerRemoveEvent);
@@ -99,7 +98,7 @@ public Hats_OnMapStart()
 		PrecacheModel2(g_eHats[i][szModel], true);
 		Downloader_AddFileToDownloadsTable(g_eHats[i][szModel]);
 	}
-
+		
 	// Just in case...
 	if(FileExists(g_eCvars[g_cvarDefaultT][sCache], true))
 	{
@@ -109,7 +108,7 @@ public Hats_OnMapStart()
 	}
 	else
 		g_bTOverride = false;
-
+		
 	if(FileExists(g_eCvars[g_cvarDefaultCT][sCache], true))
 	{
 		g_bCTOverride = true;
@@ -150,10 +149,10 @@ public Hats_Config(&Handle:kv, itemid)
 			strcopy(g_eHats[g_iHats][szAttachment], 64, "forward");
 	}
 
-
+	
 	if(!(FileExists(g_eHats[g_iHats][szModel], true)))
 		return false;
-
+		
 	++g_iHats;
 	return true;
 }
@@ -180,10 +179,10 @@ public Action:Hats_PlayerSpawn(Handle:event, const String:name[], bool:dontBroad
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	if(!IsClientInGame(client) || !IsPlayerAlive(client) || !(2<=GetClientTeam(client)<=3))
 		return Plugin_Continue;
-
+		
 	// Support for plugins that set client model
 	CreateTimer(0.1, Hats_PlayerSpawn_Post, GetClientUserId(client));
-
+		
 	return Plugin_Continue;
 }
 
@@ -219,10 +218,10 @@ CreateHat(client, itemid=-1, slot=0)
 	{
 		new m_iData = Store_GetDataIndex(m_iEquipped);
 		new m_iTeam = GetClientTeam(client);
-
+		
 		if(g_eHats[m_iData][iTeam] != 0 && m_iTeam!=g_eHats[m_iData][iTeam])
 			return;
-
+		
 		// If the model doesn't support hats, set the model to one that does
 		if(!LookupAttachment(client, g_eHats[m_iData][szAttachment]))
 		{
@@ -238,7 +237,7 @@ CreateHat(client, itemid=-1, slot=0)
 			else
 				return;
 		}
-
+		
 		// Calculate the final position and angles for the hat
 		decl Float:m_fHatOrigin[3];
 		decl Float:m_fHatAngles[3];
@@ -247,7 +246,7 @@ CreateHat(client, itemid=-1, slot=0)
 		decl Float:m_fUp[3];
 		GetClientAbsOrigin(client,m_fHatOrigin);
 		GetClientAbsAngles(client,m_fHatAngles);
-
+		
 		m_fHatAngles[0] += g_eHats[m_iData][fAngles][0];
 		m_fHatAngles[1] += g_eHats[m_iData][fAngles][1];
 		m_fHatAngles[2] += g_eHats[m_iData][fAngles][2];
@@ -262,32 +261,32 @@ CreateHat(client, itemid=-1, slot=0)
 		m_fHatOrigin[0] += m_fRight[0]*m_fOffset[0]+m_fForward[0]*m_fOffset[1]+m_fUp[0]*m_fOffset[2];
 		m_fHatOrigin[1] += m_fRight[1]*m_fOffset[0]+m_fForward[1]*m_fOffset[1]+m_fUp[1]*m_fOffset[2];
 		m_fHatOrigin[2] += m_fRight[2]*m_fOffset[0]+m_fForward[2]*m_fOffset[1]+m_fUp[2]*m_fOffset[2];
-
+		
 		// Create the hat entity
 		new m_iEnt = CreateEntityByName("prop_dynamic_override");
 		DispatchKeyValue(m_iEnt, "model", g_eHats[m_iData][szModel]);
 		DispatchKeyValue(m_iEnt, "spawnflags", "256");
 		DispatchKeyValue(m_iEnt, "solid", "0");
 		SetEntPropEnt(m_iEnt, Prop_Send, "m_hOwnerEntity", client);
-
+		
 		if(g_eHats[m_iData][bBonemerge])
 			Bonemerge(m_iEnt);
-
-		DispatchSpawn(m_iEnt);
+		
+		DispatchSpawn(m_iEnt);	
 		AcceptEntityInput(m_iEnt, "TurnOn", m_iEnt, m_iEnt, 0);
-
+		
 		// Save the entity index
 		g_iClientHats[client][g_eHats[m_iData][iSlot]]=m_iEnt;
-
+		
 		// We don't want the client to see his own hat
 		SDKHook(m_iEnt, SDKHook_SetTransmit, Hook_SetTransmit);
-
+		
 		// Teleport the hat to the right position and attach it
-		TeleportEntity(m_iEnt, m_fHatOrigin, m_fHatAngles, NULL_VECTOR);
-
+		TeleportEntity(m_iEnt, m_fHatOrigin, m_fHatAngles, NULL_VECTOR); 
+		
 		SetVariantString("!activator");
 		AcceptEntityInput(m_iEnt, "SetParent", client, m_iEnt, 0);
-
+		
 		SetVariantString(g_eHats[m_iData][szAttachment]);
 		AcceptEntityInput(m_iEnt, "SetParentAttachmentMaintainOffset", m_iEnt, m_iEnt, 0);
 	}
@@ -328,7 +327,7 @@ public Action:Hook_SetTransmit(ent, client)
 					return Plugin_Handled;
 		}
 	}
-
+	
 	return Plugin_Continue;
 }
 
@@ -345,11 +344,11 @@ public LookupAttachment(client, String:point[])
 
 public Bonemerge(ent)
 {
-	new m_iEntEffects = GetEntProp(ent, Prop_Send, "m_fEffects");
+	new m_iEntEffects = GetEntProp(ent, Prop_Send, "m_fEffects"); 
 	m_iEntEffects &= ~32;
 	m_iEntEffects |= 1;
 	m_iEntEffects |= 128;
-	SetEntProp(ent, Prop_Send, "m_fEffects", m_iEntEffects);
+	SetEntProp(ent, Prop_Send, "m_fEffects", m_iEntEffects); 
 }
 
 public Store_OnClientModelChanged(client, String:model[])
@@ -372,11 +371,11 @@ public Store_OnClientModelChanged(client, String:model[])
 				CreateHat(client, -1, i);
 			}
 		}
-
+		
 		if(m_bHasHats)
 			if(g_eCvars[g_cvarOverrideEnabled][aCache])
-				CPrintToChat(client, "%t", "Override Enabled");
+				Chat(client, "%t", "Override Enabled");
 			else
-				CPrintToChat(client, "%t", "Override Disabled");
+				Chat(client, "%t", "Override Disabled");
 	}
 }

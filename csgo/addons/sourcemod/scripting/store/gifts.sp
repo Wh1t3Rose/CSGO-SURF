@@ -5,7 +5,6 @@
 #include <store>
 #include <gifts>
 #include <zephstocks>
-#include <csgocolors>
 #endif
 
 new g_cvarGiftsEnabled = -1;
@@ -44,29 +43,29 @@ public Action:Command_Drop(client, args)
 {
 	if(client && !GetClientPrivilege(client, g_eCvars[g_cvarGiftsFlag][aCache]))
 	{
-		CPrintToChat(client, "%t", "You dont have permission");
+		Chat(client, "%t", "You dont have permission");
 		return Plugin_Handled;
 	}
 
 	if(!g_eCvars[g_cvarGiftsEnabled][aCache])
 	{
-		CPrintToChat(client, "%t", "Credit Gift Disabled");
+		Chat(client, "%t", "Credit Gift Disabled");
 		return Plugin_Handled;
 	}
 
 	if(!IsPlayerAlive(client))
 	{
-		CPrintToChat(client, "%t", "Must be Alive");
+		Chat(client, "%t", "Must be Alive");
 		return Plugin_Handled;
 	}
 
 	decl String:m_szTmp[64];
 	GetCmdArg(1, m_szTmp, sizeof(m_szTmp));
-
+	
 	new m_iCredits = StringToInt(m_szTmp);
 	if(g_eClients[client][iCredits]<m_iCredits || m_iCredits<=0)
 	{
-		CPrintToChat(client, "%t", "Credit Invalid Amount");
+		Chat(client, "%t", "Credit Invalid Amount");
 		return Plugin_Handled;
 	}
 
@@ -77,7 +76,7 @@ public Action:Command_Drop(client, args)
 
 	Store_SetClientCredits(client, Store_GetClientCredits(client)-m_iCredits);
 
-	CPrintToChat(client, "%t", "Credit Gift Dropped", m_iCredits);
+	Chat(client, "%t", "Credit Gift Dropped", m_iCredits);
 
 	Store_LogMessage(client, -m_iCredits, "Dropped %d credits on the ground", m_iCredits);
 
@@ -152,7 +151,7 @@ public Gifts_OnPickUp(client)
 {
 	new m_iCredits = GetRandomInt(g_eCvars[g_cvarGiftsMinimum][aCache], g_eCvars[g_cvarGiftsMaximum][aCache]);
 	Store_SetClientCredits(client, Store_GetClientCredits(client)+m_iCredits);
-	CPrintToChat(client, "%t", "Gift Credit Picked", m_iCredits);
+	Chat(client, "%t", "Gift Credit Picked", m_iCredits);
 }
 
 public Gifts_OnPickUpItem(client, data, owner)
@@ -172,7 +171,7 @@ public Gifts_OnPickUpItem(client, data, owner)
 	Store_GetHandler(m_eItem[iHandler], m_eHandler);
 
 	Store_GiveItem(client, itemid, purchase, expiration, price);
-	CPrintToChat(client, "%t", "Gift Item Picked", m_eItem[szName], m_eHandler[szType]);
+	Chat(client, "%t", "Gift Item Picked", m_eItem[szName], m_eHandler[szType]);
 
 	Store_LogMessage(client, 0, "Picked up a gift containing the following item: %s", m_eItem[szName]);
 }
@@ -180,7 +179,7 @@ public Gifts_OnPickUpItem(client, data, owner)
 public Gifts_OnPickUpCredit(client, data, owner)
 {
 	Store_SetClientCredits(client, Store_GetClientCredits(client)+data);
-	CPrintToChat(client, "%t", "Gift Credit Picked", data);
+	Chat(client, "%t", "Gift Credit Picked", data);
 
 	Store_LogMessage(client, data, "Picked up a gift containing %d credits", data);
 }

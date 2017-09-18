@@ -4,7 +4,6 @@
 
 #include <store>
 #include <zephstocks>
-#include <csgocolors>
 #endif
 
 new g_iRespawnRoundLimit[MAXPLAYERS+1] = {0,...};
@@ -65,7 +64,7 @@ public Respawn_Equip(client, id)
 {
 	if(g_iRespawnRoundLimit[client] == g_eCvars[g_cvarRespawnRoundLimit][aCache])
 	{
-		CPrintToChat(client, "%t", "Respawn Round Limit");
+		Chat(client, "%t", "Respawn Round Limit");
 		return 1;
 	}
 

@@ -8,7 +8,6 @@
 #include <tf2>
 #include <tf2_stocks>
 #include <tf2items>
-#include <csgocolors>
 #endif
 
 enum TFWeapon
@@ -64,15 +63,15 @@ public TFSupport_OnPluginStart()
 #if defined STANDALONE_BUILD
 	new String:m_szGameDir[32];
 	GetGameFolderName(m_szGameDir, sizeof(m_szGameDir));
-
+	
 	if(strcmp(m_szGameDir, "tf")==0)
 		GAME_TF2 = true;
 #endif
 	if(!GAME_TF2)
-		return;
+		return;	
 
 #if !defined STANDALONE_BUILD
-	// This is not a standalone build, we don't want hats to kill the whole plugin for us
+	// This is not a standalone build, we don't want hats to kill the whole plugin for us	
 	if(GetExtensionFileStatus("tf2items.ext")!=1)
 	{
 		g_bTF2Enabled = false;
@@ -91,12 +90,12 @@ public TFSupport_OnPluginStart()
 		PrepSDKCall_SetFromConf(m_hGameConf, SDKConf_Virtual, "EquipWearable");
 		PrepSDKCall_AddParameter(SDKType_CBaseEntity, SDKPass_Pointer);
 		g_hSdkEquipWearable = EndPrepSDKCall();
-
+		
 		CloseHandle(m_hGameConf);
 	}
 	else
 		return;
-
+	
 	Store_RegisterHandler("tfunusual", "unusual_id", TFSupport_OnMapStart, TFSupport_Reset, TFUnusual_Config, TFSupport_Equip, TFSupport_Remove, true);
 	Store_RegisterHandler("tfhatdye", "color", TFSupport_OnMapStart, TFSupport_Reset, TFHatDye_Config, TFSupport_Equip, TFSupport_Remove, true);
 	Store_RegisterHandler("tfweapon", "unique_id", TFWeapon_OnMapStart, TFSupport_Reset, TFWeapon_Config, TFWeapon_Equip, TFSupport_Remove, false);
@@ -144,9 +143,9 @@ public TFSupport_Reset()
 public TFUnusual_Config(&Handle:kv, itemid)
 {
 	Store_SetDataIndex(itemid, g_iTFUnusual);
-
+	
 	g_eTFUnusual[g_iTFUnusual] = KvGetNum(kv, "unusual_id");
-
+	
 	++g_iTFUnusual;
 	return true;
 }
@@ -154,9 +153,9 @@ public TFUnusual_Config(&Handle:kv, itemid)
 public TFHatDye_Config(&Handle:kv, itemid)
 {
 	Store_SetDataIndex(itemid, g_iTFHatDye);
-
+	
 	KvGetColor(kv, "color", g_eTFHatDye[g_iTFHatDye][0], g_eTFHatDye[g_iTFHatDye][1], g_eTFHatDye[g_iTFHatDye][2], g_eTFHatDye[g_iTFHatDye][3]);
-
+	
 	++g_iTFHatDye;
 	return true;
 }
@@ -164,9 +163,9 @@ public TFHatDye_Config(&Handle:kv, itemid)
 public TFHead_Config(&Handle:kv, itemid)
 {
 	Store_SetDataIndex(itemid, g_iTFHeads);
-
+	
 	g_flTFHeads[g_iTFHeads] = KvGetFloat(kv, "size", 1.0);
-
+	
 	++g_iTFHeads;
 	return true;
 }
@@ -174,11 +173,11 @@ public TFHead_Config(&Handle:kv, itemid)
 public TFHat_Config(&Handle:kv, itemid)
 {
 	Store_SetDataIndex(itemid, g_iTFHats);
-
+	
 	KvGetString(kv, "model", g_szTFHats[g_iTFHats], PLATFORM_MAX_PATH);
 	g_flTFHatsOffset[g_iTFHats] = KvGetFloat(kv, "offset");
 	g_iTFHatBuilding[g_iTFHats] = KvGetNum(kv, "building");
-
+	
 	++g_iTFHats;
 	return true;
 }
@@ -186,9 +185,9 @@ public TFHat_Config(&Handle:kv, itemid)
 public TFWeaponSize_Config(&Handle:kv, itemid)
 {
 	Store_SetDataIndex(itemid, g_iTFWeaponSizes);
-
+	
 	g_flTFWeaponSizes[g_iTFWeaponSizes] = KvGetFloat(kv, "size", 1.0);
-
+	
 	++g_iTFWeaponSizes;
 	return true;
 }
@@ -196,7 +195,7 @@ public TFWeaponSize_Config(&Handle:kv, itemid)
 public TFWeapon_Config(&Handle:kv, itemid)
 {
 	Store_SetDataIndex(itemid, g_iTFWeapons);
-
+	
 	g_eTFWeapons[g_iTFWeapons][m_unAttribs] = 0;
 
 	KvGetString(kv, "classname", g_eTFWeapons[g_iTFWeapons][m_szEntity], 64);
@@ -220,7 +219,7 @@ public TFWeapon_Config(&Handle:kv, itemid)
 	} while (KvGotoNextKey(kv));
 
 	KvGoBack(kv);
-
+	
 	++g_iTFWeapons;
 	return true;
 }
@@ -282,7 +281,7 @@ public TFWeapon_Equip(client, id)
 {
 	if(!IsPlayerAlive(client))
 	{
-		CPrintToChat(client, "%t", "Must be Alive");
+		Chat(client, "%t", "Must be Alive");
 		return 1;
 	}
 
@@ -293,7 +292,7 @@ public TFWeapon_Equip(client, id)
 
 	if(_:TF2_GetPlayerClass(client) != g_eTFWeapons[idx][m_unClass])
 	{
-		CPrintToChat(client, "%t", "TF Wrong Class");
+		Chat(client, "%t", "TF Wrong Class");
 		return 1;
 	}
 
@@ -374,10 +373,10 @@ public RgbToDec(r, g, b)
 {
 	decl String:hex[32];
 	Format(hex, sizeof(hex), "%02X%02X%02X", r, g, b);
-
+	
 	decl ret;
 	StringToIntEx(hex, ret, 16);
-
+	
 	return ret;
 }
 
@@ -469,7 +468,7 @@ public TFWeapon_CreateChild(client, idx)
 
 	new m_iTeam = GetClientTeam(client);
 	new parent = CreateEntityByName("tf_wearable");
-
+	
 	Bonemerge(parent);
 	SetEntProp(parent, Prop_Send, "m_iTeamNum", m_iTeam);
 	SetEntProp(parent, Prop_Send, "m_nSkin", (m_iTeam-2));
@@ -504,12 +503,12 @@ public TFWeapon_CreateChild(client, idx)
 	DispatchKeyValue(m_iEnt_Hack, "spawnflags", "256");
 	DispatchKeyValue(m_iEnt_Hack, "solid", "0");
 	SetEntPropEnt(m_iEnt_Hack, Prop_Send, "m_hOwnerEntity", client);
-
+	
 	Bonemerge(m_iEnt_Hack);
-
-	DispatchSpawn(m_iEnt_Hack);
+	
+	DispatchSpawn(m_iEnt_Hack);	
 	AcceptEntityInput(m_iEnt_Hack, "TurnOn", m_iEnt_Hack, m_iEnt_Hack, 0);
-
+	
 	// Save the entity index
 	g_iClientWeapons[client][2]=m_iEnt_Hack;
 
@@ -527,10 +526,10 @@ public TFWeapon_CreateChild(client, idx)
 	Bonemerge(m_iEnt);
 
 	SetEntityModel(m_iEnt, m_szModelName);
-
+	
 	SetVariantString("!activator");
 	AcceptEntityInput(m_iEnt_Hack, "SetParent", m_iEnt, m_iEnt_Hack, 0);
-
+	
 	SetVariantString("head");
 	AcceptEntityInput(m_iEnt_Hack, "SetParentAttachment", m_iEnt_Hack, m_iEnt_Hack, 0);
 
@@ -554,7 +553,7 @@ public TFWeapon_CreateChild(client, idx)
 }
 
 stock TF2_EquipWearable(iOwner, iItem)
-{
+{	
 	SDKCall(g_hSdkEquipWearable, iOwner, iItem);
 }
 
@@ -615,7 +614,7 @@ public TFWeapon_OnGameFrame()
 			g_bTFHide[m_iOwner] = true;
 			if(g_hRemoveTimer[m_iOwner]==INVALID_HANDLE)
 				g_hRemoveTimer[m_iOwner]=CreateTimer(0.1, TFWeapon_DeleteChilds, GetClientUserId(m_iOwner));
-		}
+		}	
 		else if(!m_bHide && g_bTFHide[m_iOwner])
 		{
 			g_bTFHide[m_iOwner] = false;
@@ -650,7 +649,7 @@ public Action:TFWeapon_CreateChilds(Handle:timer, any:userid)
 }
 
 public Action:TFHat_PickupObject(Handle:event, const String:name[], bool:dontBroadcast)
-{
+{	
 	new client = GetClientOfUserId(GetEventInt(event, "userid"));
 	if(!client || !IsClientInGame(client) || !IsPlayerAlive(client))
 		return Plugin_Continue;
@@ -660,7 +659,7 @@ public Action:TFHat_PickupObject(Handle:event, const String:name[], bool:dontBro
 		return Plugin_Continue;
 
 	TFHat_Destroy(m_iBuilding);
-
+	
 	return Plugin_Continue;
 }
 
@@ -670,7 +669,7 @@ public Action:TFHat_DropObject(Handle:event, const String:name[], bool:dontBroad
 	if(!client || !IsClientInGame(client) || !IsPlayerAlive(client))
 		return Plugin_Continue;
 	new TFObjectType:object_s = TFObjectType:GetEventInt(event, "object");
-
+	
 	new m_iBuilding = GetEventInt(event, "index");
 	if(!m_iBuilding || !IsValidEntity(m_iBuilding))
 		return Plugin_Continue;
@@ -703,7 +702,7 @@ public Action:TFHat_UpgradeObject(Handle:event, const String:name[], bool:dontBr
 
 	TFHat_Destroy(m_iBuilding);
 	CreateTimer(2.0, TFHat_Respawn, data);
-
+	
 	return Plugin_Continue;
 }
 
@@ -734,20 +733,20 @@ public Action:TFHat_PlayerBuiltObject(Handle:event, const String:name[], bool:do
 	if(!client || !IsClientInGame(client) || !IsPlayerAlive(client))
 		return Plugin_Continue;
 	new TFObjectType:object_s = TFObjectType:GetEventInt(event, "object");
-
-
+	
+		
 	new m_iBuilding = GetEventInt(event, "index");
 	if(!m_iBuilding || !IsValidEntity(m_iBuilding))
 		return Plugin_Continue;
 
 	if(!GetEntProp(m_iBuilding, Prop_Send, "m_bCarryDeploy"))
-	{
+	{		
 		if(object_s == TFObject_Sentry || object_s == TFObject_Dispenser)
 		{
 			TFHat_Spawn(m_iBuilding, client, object_s);
 		}
 	}
-
+	
 	return Plugin_Continue;
 }
 
@@ -767,17 +766,17 @@ public TFHat_Spawn(ent, owner, TFObjectType:type)
 	new m_iEquippedHat = Store_GetEquippedItem(owner, "tfhat", _:type);
 	if(m_iEquippedHat < 0)
 		return;
-	new data = Store_GetDataIndex(m_iEquippedHat);
+	new data = Store_GetDataIndex(m_iEquippedHat);	
 
 	new Float:pPos[3], Float:pAng[3];
 	new prop = CreateEntityByName("prop_dynamic_override");
 	new level = -1;
 
 	level = GetEntProp(ent, Prop_Send, "m_iUpgradeLevel");
-
+	
 	if(IsValidEntity(prop))
 	{
-		DispatchKeyValue(prop, "model", g_szTFHats[data]);
+		DispatchKeyValue(prop, "model", g_szTFHats[data]); 
 
 		DispatchSpawn(prop);
 		AcceptEntityInput(prop, "Enable");
@@ -785,7 +784,7 @@ public TFHat_Spawn(ent, owner, TFObjectType:type)
 
 		SetVariantString("!activator");
 		AcceptEntityInput(prop, "SetParent", ent);
-
+		
 		if(type == TFObject_Dispenser)
 		{
 			SetVariantString("build_point_0");
@@ -797,31 +796,31 @@ public TFHat_Spawn(ent, owner, TFObjectType:type)
 			else
 				SetVariantString("rocket_r");
 		}
-
+			
 		AcceptEntityInput(prop, "SetParentAttachment", ent);
-
+		
 		GetEntPropVector(prop, Prop_Send, "m_vecOrigin", pPos);
 		GetEntPropVector(prop, Prop_Send, "m_angRotation", pAng);
-
+		
 		pPos[2] += g_flTFHatsOffset[data];
-
+			
 		if(type == TFObject_Dispenser)
 		{
 			pPos[2] += 13.0;
 			pAng[1] += 180.0;
-
+			
 			if(level == 3)
 			{
 				pPos[2] += 8.0;
 			}
 		}
-
+		
 		if(level == 3 && type != TFObject_Dispenser)
 		{
 			pPos[2] += 6.5;
 			pPos[0] -= 11.0;
 		}
-
+		
 		SetEntPropVector(prop, Prop_Send, "m_vecOrigin", pPos);
 		SetEntPropVector(prop, Prop_Send, "m_angRotation", pAng);
 
@@ -848,10 +847,10 @@ public TFWeaponSize_ResizeWeapon(client)
 #if defined STANDALONE_BUILD
 public Bonemerge(ent)
 {
-	new m_iEntEffects = GetEntProp(ent, Prop_Send, "m_fEffects");
+	new m_iEntEffects = GetEntProp(ent, Prop_Send, "m_fEffects"); 
 	m_iEntEffects &= ~32;
 	m_iEntEffects |= 1;
 	m_iEntEffects |= 128;
-	SetEntProp(ent, Prop_Send, "m_fEffects", m_iEntEffects);
+	SetEntProp(ent, Prop_Send, "m_fEffects", m_iEntEffects); 
 }
 #endif
