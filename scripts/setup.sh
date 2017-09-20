@@ -8,7 +8,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
-echo -e "${RED}Removing Existing Addons Directory if Applicable. If You Don't Have an installed Server to cso_surf Then This Will Do Nothing and is Safe. Script will continue in 10 Secs...${NC}" && sleep 1
+echo -e "${RED}Removing Existing Addons Directory if Applicable. If You Don't Have an installed server to csgo_surf, then this will Do nothing and is safe. Script will continue in 10 Secs...${NC}" && sleep 10
 rm -rf $server_dir/addons
 
 # make addons folder
@@ -52,15 +52,15 @@ done
 
 # map files
 echo -e "${GREEN}Installing Map Files...${NC}" && sleep 2
-wget https://mega.nz/#!ERZgGCwD!DJceFOA7WO6l60EpwuF5WADjkcQWwC6AuLVM5mskXeg	
+wget "http://www.snthtk.darktech.org/forum/sharedfiles/maps.tar.bz2"
 for dest in $server_dir/
 do
 find $server_dir/maps -maxdepth 1 -type f -delete
-cp -f $HOME/github/CSGO-SURF/csgo/* $dest
+cp -f $HOME/github/CSGO-SURF/scripts/maps.tar.bz2 $dest
 done
 
 #Extract maps.tar.bz2
-tar -xvjf $HOME/csgo_surf/csgo/maps.tar.bz2 -C $HOME/csgo_surf/csgo && rm -f && rm '$server_dir/maps.tar.bz2' -f
+tar -xvjf $server_dir/maps.tar.bz2 -C $HOME/csgo_surf/csgo && rm -f && rm '$server_dir/maps.tar.bz2' -f
 
 # extract individual maps and nav files
 echo -e "${RED}Still Installing Map Files Please Be Patient...${NC}" && sleep 5
