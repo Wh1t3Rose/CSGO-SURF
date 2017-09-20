@@ -4,6 +4,11 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
+# Setup needed 32 libraries
+echo -e "Installing required 32 libraries from Official Ubuntu Repos" && sleep 5
+sudo dpkg --add-architecture i386 && sudo apt-get update
+sudo apt-get install lib32gcci zlib1g:i386
+
 # Set Install Dir
 server_dir="$HOME/csgo_surf"
 
