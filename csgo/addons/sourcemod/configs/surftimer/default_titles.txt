@@ -15,17 +15,32 @@
 {
   "0"
   {
-    "flag" "z"
+    "flag" "z" // root flag. Only you should have this flag!
     "title" "{default}[{darkred}Owner{default}]"
   }
   "1"
   {
-    "flag" "b"
-    "title" "{default}[{green}Admin{default}]"
+    "flag" "m" //m is rcon. if your Super-Admin doesn't have this flag then change it!
+    "title" "{default}[{red}Super-Admin{default}]"
   }
-  // "2"
+  "2"
+  {
+    "flag" "b" // generic admin flag
+    "title" "{default}[{darkblue}Admin{default}]"
+  }
+  "3"
+  {
+    "flag" "b" // generic admin flag. I use this for Mods as it's generally the only flag they have.
+    "title" "{default}[{lightblue}Mod{default}]"
+  }
+  "4"
+  {
+    "flag" "a" // VIP
+    "title" "{default}[{purple}VIP{default}]"
+  }
+  // "4" // Used to give a specific player a specific tag
   // {
-  //  "steamid" "STEAM_1:0:20019070"
+  //  "steamid" "STEAM_1:0:20019070" // Joe Smo
   //  "title" "[test]"
   // }
 }

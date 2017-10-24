@@ -59,6 +59,12 @@ find $server_dir/maps -maxdepth 1 -type f -delete
 cp -f $HOME/github/CSGO-SURF/scripts/maps.tar.bz2 $dest
 done
 
+for dest in $server_dir
+do
+cp -rf $HOME/github/CSGO-SURF/csgo/maplist.txt $dest
+cp -rf $HOME/github/CSGO-SURF/csgo/cfg/mapcycle.txt $dest
+done
+
 #Extract maps.tar.bz2
 tar -xvjf $server_dir/maps.tar.bz2 -C $HOME/csgo_test/csgo && rm -f && rm '$server_dir/maps.tar.bz2' -f
 
