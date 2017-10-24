@@ -10,13 +10,13 @@ sudo dpkg --add-architecture i386 && sudo apt-get update
 sudo apt-get install lib32gcci zlib1g:i386
 
 # Set Install Dir
-server_dir="$HOME/csgo_surf"
+server_dir="$HOME/csgo_test"
 
 # download steamcmd
 cd $HOME
-echo -e "${RED}Deleting steamcmd & csgo_surf directories if they exist...${NC}" && sleep 2
+echo -e "${RED}Deleting steamcmd & csgo_test directories if they exist...${NC}" && sleep 2
 rm -rf ~/steamcmd
-rm -rf ~/csgo_surf
+rm -rf ~/csgo_test
 echo -e "${GREEN}Downloading & Installing SteamCmd...${NC}" && sleep 2
 wget http://media.steampowered.com/installer/steamcmd_linux.tar.gz
 mkdir ~/steamcmd
