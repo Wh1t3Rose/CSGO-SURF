@@ -8,7 +8,10 @@ This is an automatic install.
 Preconfigured Plugins List:
 
 Preconfigured Plugins​
+
+
 Required:
+
 AutoFileLoader - Caches all material, model, and sound files for players to download.
 Dynamic - PreReq for many plugins to work properly.
 Mapchooser_Extended - Creates map vote at the end of each match. Controlled by maplist.cfg and mapcycle.cfg.
@@ -16,6 +19,7 @@ SlopeFix - Smooths out ramps and prevents clipping with player models. (Eg. no m
 SurfTimer- Core of this server.
 
 Optional:
+
 CallAdmin - Allows players to report players in game to your Discord/TS server. Requires Discord_API
 Chat-Processor - Allows for chat colors in chat.
 chat_colors_csgo - Used to give players chat colors.
@@ -30,6 +34,7 @@ thirdperson - Allows players to view their player model in thirdperson. Useful f
 updater - Used to automatically update plugins when the author releases an update. Must be supported by the plugin!
 
 Disabled:
+
 ckcredits- Used to give store credits to players upon map completion. Requires Store.
 donate_csgo - Allows players to donate to your server via paypal. Must have MOTD enabled both serverside and playerside!
 drapi_join_sounds - Play a sound to all players (song, tone, etc) when an Admin/VIP joins the server. Many players find this annoying. You've been warned!
