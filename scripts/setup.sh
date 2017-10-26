@@ -1,6 +1,6 @@
 #!/bin/bash
 
-server_dir="$HOME/csgo_test/csgo"
+server_dir="$HOME/csgo_surf/csgo"
 configs="$HOME/github/CSGO-SURF/csgo/addons/sourcemod/configs/"
 cd_dir="eval cd "$HOME/github/CSGO-SURF/csgo/""
 
@@ -8,7 +8,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
-echo -e "${RED}Removing Existing Addons Directory if Applicable. If You Don't Have an installed server to csgo_test, then this will Do nothing and is safe. Script will continue in 10 Secs...${NC}" && sleep 10
+echo -e "${RED}Removing Existing Addons Directory if Applicable. If You Don't Have an installed server to csgo_surf, then this will Do nothing and is safe. Script will continue in 10 Secs...${NC}" && sleep 10
 rm -rf $server_dir/addons
 
 # make addons folder
@@ -66,7 +66,7 @@ cp -rf $HOME/github/CSGO-SURF/csgo/cfg/mapcycle.txt $dest
 done
 
 #Extract maps.tar.bz2
-tar -xvjf $server_dir/maps.tar.bz2 -C $HOME/csgo_test/csgo && rm -f && rm '$server_dir/maps.tar.bz2' -f
+tar -xvjf $server_dir/maps.tar.bz2 -C $HOME/csgo_surf/csgo && rm -f && rm '$server_dir/maps.tar.bz2' -f
 
 # extract individual maps and nav files
 echo -e "${RED}Still Installing Map Files Please Be Patient...${NC}" && sleep 5
@@ -80,7 +80,7 @@ done
 
 # Copy start script and start server
 echo -e "${GREEN}Copying Over Start Script and Starting Server...${NC}" && sleep 5
-for dest in $HOME/csgo_test
+for dest in $HOME/csgo_surf
 do
 cp -rf $HOME/github/CSGO-SURF/scripts/start.sh $dest && cd $dest && sh start.sh
 done
