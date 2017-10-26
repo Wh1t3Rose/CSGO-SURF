@@ -19,5 +19,8 @@
 //
 // Use "full" instead of the windows size for adjust the windows size to the client resolution
 //
-"!motd" "full" http://domain.com/motd
-"motd" "full" http://domain.com/motd
+"!fullmotd" "full" http://example.com
+"!motd" "full" http://example.com
+"motd" "full" http://example.com
+"!rank" "full" http://example.com
+"rank" "full" http://example.com
