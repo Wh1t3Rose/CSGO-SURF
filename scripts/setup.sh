@@ -52,7 +52,7 @@ done
 
 # map files
 echo -e "${GREEN}Installing Map Files...${NC}" && sleep 2
-wget "http://www.snthtk.darktech.org/forum/sharedfiles/maps.tar.bz2"
+wget -0 $server_dir/maps.tar.bz2 "http://www.snthtk.darktech.org/forum/sharedfiles/maps.tar.bz2"
 for dest in $server_dir/
 do
 find $server_dir/maps -maxdepth 1 -type f -delete
