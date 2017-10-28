@@ -26,7 +26,6 @@ cd ~/steamcmd
 
 # download srcds for csgo (740)
 ./steamcmd.sh +login anonymous +force_install_dir $server_dir +app_update 740 validate +quit
-./steamcmd.sh +login anonymous +force_install_dir $server_dir +app_update 740 validate +quit 
 
 # copy directories to server
 echo -e "${GREEN}Starting Setup Script...${NC}" && sleep 3
