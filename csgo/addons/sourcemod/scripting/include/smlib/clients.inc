@@ -571,7 +571,7 @@ stock bool:Client_IsOnLadder(client)
 	}
 }
 
-enum Water_Level
+enum Water_level
 {
 	WATER_LEVEL_NOT_IN_WATER = 0,
 	WATER_LEVEL_FEET_IN_WATER,

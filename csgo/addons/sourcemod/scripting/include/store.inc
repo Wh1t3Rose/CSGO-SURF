@@ -3,8 +3,8 @@
 #endif
 #define _store_included
 
-new g_cvarChatTag = -1;
-#define CHAT_TAG g_eCvars[g_cvarChatTag][sCache]
+//new g_cvarChatTag = -1;
+#define CHAT_TAG g_eCvars[-1][sCache]
 
 #define ITEM_NAME_LENGTH 64
 #define STORE_MAX_ITEMS 2048
@@ -14,14 +14,14 @@ new g_cvarChatTag = -1;
 
 enum Item_Plan
 {
-	String:szName[ITEM_NAME_LENGTH],
+	String:szNameWDF[ITEM_NAME_LENGTH],
 	iPrice,
 	iTime
 }
 
 enum Store_Item
 {
-	String:szName[ITEM_NAME_LENGTH],
+	String:szNameWDF[ITEM_NAME_LENGTH],
 	String:szUniqueId[PLATFORM_MAX_PATH],
 	String:szShortcut[64],
 	iId,
@@ -38,7 +38,7 @@ enum Store_Item
 
 enum Type_Handler
 {
-	String:szType[64],
+	String:szTypeWDF[64],
 	String:szUniqueKey[32],
 	bool:bEquipable,
 	bool:bRaw,
