@@ -25,6 +25,7 @@ rm steamcmd_linux.tar.gz*
 cd ~/steamcmd
 
 # download srcds for csgo (740)
+mkdir ~/csgo_surf
 ./steamcmd.sh +login anonymous +force_install_dir $server_dir +app_update 740 validate +quit
 
 # copy directories to server
