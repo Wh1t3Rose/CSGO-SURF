@@ -6,11 +6,12 @@ NC='\033[0m' # No Color
 
 # Setup needed 32 libraries
 echo -e "Installing required 32 libraries from Official Ubuntu Repos" && sleep 5
-sudo dpkg --add-architecture i386 && sudo apt-get update
+sudo dpkg --add-architecture i386
+sudo apt-get update
 sudo apt-get install lib32gcci zlib1g:i386
 
 # Set Install Dir
-server_dir="$HOME/csgo_surf"
+server_dir="$HOME/csgo_surf/"
 
 # download steamcmd
 cd $HOME
@@ -25,7 +26,7 @@ rm steamcmd_linux.tar.gz*
 cd ~/steamcmd
 
 # download srcds for csgo (740)
-mkdir ~/csgo_surf
+mkdir ~/csgo_surf/
 ./steamcmd.sh +login anonymous +force_install_dir $server_dir +app_update 740 validate +quit
 
 # copy directories to server
