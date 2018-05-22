@@ -20,7 +20,7 @@ rm -rf ~/csgo_surf
 echo -e "${GREEN}Downloading & Installing SteamCmd...${NC}" && sleep 2
 wget http://media.steampowered.com/installer/steamcmd_linux.tar.gz
 mkdir ~/steamcmd
-tar -xvzf steamcmd_linux.tar.gz -C steamcmd
+tar -xvzf steamcmd_linux.tar.gz -C ~/steamcmd
 rm steamcmd_linux.tar.gz*
 cd ~/steamcmd
 
